@@ -22,6 +22,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.outmcn.Friend
         INFOPLIST_FILE: Friend/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SWIFT_OBJC_BRIDGING_HEADER: Friend/Friend-Bridging-Header.h
         TARGETED_DEVICE_FAMILY: "1,2"
     scheme:
