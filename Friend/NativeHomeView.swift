@@ -6,7 +6,8 @@ struct NativeHomeView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            FriendHomeBackground()
+            Color.black.opacity(0.20).ignoresSafeArea()
             VStack(spacing: 0) {
                 HStack {
                     Image("FriendLogo").resizable().scaledToFit().frame(height: 34)
