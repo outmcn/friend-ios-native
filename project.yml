@@ -1,0 +1,26 @@
+name: Friend
+options:
+  deploymentTarget:
+    iOS: "15.0"
+  bundleIdPrefix: com.outmcn
+  xcodeVersion: "16.4"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    DEVELOPMENT_TEAM: ""
+targets:
+  Friend:
+    type: application
+    platform: iOS
+    sources:
+      - path: Friend
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.outmcn.Friend
+        INFOPLIST_FILE: Friend/Info.plist
+        SWIFT_OBJC_BRIDGING_HEADER: Friend/Friend-Bridging-Header.h
+        TARGETED_DEVICE_FAMILY: "1,2"
+    scheme:
+      gatherCoverageData: false
