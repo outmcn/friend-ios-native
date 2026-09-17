@@ -34,6 +34,8 @@ struct LoginView: View {
         }
         .padding(24)
         .navigationTitle("登录")
-        .navigationDestination(isPresented: $showHome) { HomeView() }
+        .background(
+            NavigationLink(destination: HomeView(), isActive: $showHome) { EmptyView() }
+        )
     }
 }
