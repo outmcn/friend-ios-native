@@ -4,7 +4,13 @@ import SwiftUI
 struct FriendApp: App {
     var body: some Scene {
         WindowGroup {
-            RootView()
+            NavigationView {
+                if TokenStore.shared.token == nil {
+                    LoginView()
+                } else {
+                    HomeView()
+                }
+            }
         }
     }
 }
