@@ -2,7 +2,7 @@ import SwiftUI
 
 struct RootView: View {
     var body: some View {
-        NavigationStack {
+        NavigationView {
             VStack(spacing: 16) {
                 Image(systemName: "bubble.left.and.bubble.right.fill")
                     .font(.system(size: 56))
