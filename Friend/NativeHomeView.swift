@@ -35,8 +35,7 @@ struct NativeHomeView: View {
                         LazyVStack(spacing: 16) {
                             ForEach(model.users) { user in
                                 HStack(spacing: 12) {
-                                    AsyncImage(url: URL(string: user.headPortrait ?? "")) { image in image.resizable().scaledToFill() } placeholder: { Color.gray }
-                                        .frame(width: 54, height: 54).clipShape(Circle())
+                                    RemoteAvatar(urlString: user.headPortrait)
                                     Text(user.nickName ?? "用户").foregroundStyle(.white).font(.headline)
                                     Spacer()
                                 }

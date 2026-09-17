@@ -10,8 +10,7 @@ struct FollowFansView: View {
                 .pickerStyle(.segmented).padding()
             List { ForEach(model.items) { item in
                 HStack(spacing: 12) {
-                    AsyncImage(url: URL(string: item.headPortrait ?? "")) { $0.resizable().scaledToFill() } placeholder: { Color.gray }
-                        .frame(width: 51, height: 51).clipShape(Circle())
+                    RemoteAvatar(urlString: item.headPortrait, size: 51)
                     VStack(alignment: .leading, spacing: 5) { Text(item.nickName ?? "用户"); Text(item.city ?? "").font(.footnote).foregroundStyle(Color(red: 0.95, green: 0.80, blue: 0.38)) }
                     Spacer()
                     Button(model.buttonTitle(item)) { Task { await model.action(item) } }

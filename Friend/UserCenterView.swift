@@ -11,8 +11,7 @@ struct UserCenterView: View {
                 VStack(spacing: 16) {
                     if let info = model.userInfo {
                         HStack(spacing: 14) {
-                            AsyncImage(url: URL(string: info.headPortrait ?? "")) { image in image.resizable().scaledToFill() } placeholder: { Color.gray }
-                                .frame(width: 72, height: 72).clipShape(Circle())
+                            RemoteAvatar(urlString: info.headPortrait, size: 72)
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(info.nickName ?? "用户").font(.title3.bold())
                                 Text("余额  \(info.goldBalance ?? 0)").font(.subheadline).foregroundStyle(.secondary)
