@@ -19,10 +19,13 @@ final class AuthViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         do {
-            let response: LoginResponse = try await APIClient.shared.request(
+            let envelope: APIEnvelope<LoginResponse> = try await APIClient.shared.request(
                 path: "token/login", method: "POST",
                 body: LoginRequest(username: username, password: password), token: nil
             )
+            guard envelope.code == 200, let response = envelope.data else {
+                throw APIError(statusCode: nil, message: envelope.msg ?? "登录失败")
+            }
             guard let token = response.token, !token.isEmpty else { throw APIError(statusCode: nil, message: "登录响应缺少 Token") }
             TokenStore.shared.token = token
             user = response.info
