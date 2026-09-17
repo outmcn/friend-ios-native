@@ -33,7 +33,7 @@ struct UserCenterView: View {
                         Button("请登录") { showLogin = true }
                     }
                     VStack(spacing: 0) {
-                        NavigationLink("隐私设置", destination: Text("隐私设置"))
+                        NavigationLink("关注 / 粉丝", destination: FollowFansView())
                             .padding()
                         if model.userInfo != nil {
                             Button("退出登录", role: .destructive) { Task { await model.logout() } }.padding()
