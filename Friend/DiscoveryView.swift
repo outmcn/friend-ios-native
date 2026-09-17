@@ -11,7 +11,7 @@ final class DiscoveryViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         do {
-            let response: APIEnvelope<[DiscoveryUser]> = try await APIClient.shared.request(path: "community/fruser/dynamic/user")
+            let response: APIEnvelope<[DiscoveryUser]> = try await APIClient.shared.request(path: "community/fruser/dynamic/user", method: "GET", body: EmptyBody())
             users = response.data ?? []
         } catch { errorMessage = error.localizedDescription }
     }

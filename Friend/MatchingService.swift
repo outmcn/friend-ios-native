@@ -38,8 +38,7 @@ final class MatchingService: NSObject, URLSessionWebSocketDelegate {
         request.setValue(TokenStore.shared.token, forHTTPHeaderField: "Authorization")
         socket = session.webSocketTask(with: request)
         socket?.resume()
-        try await sendText(#"{"messageType":"CONNECT","info":"
-"# + String(userId) + #""}"#)
+        try await sendText("{\"messageType\":\"CONNECT\",\"info\":\"" + String(userId) + "\"}")
         heartbeat = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
