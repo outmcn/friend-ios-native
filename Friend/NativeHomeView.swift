@@ -50,7 +50,7 @@ struct NativeHomeView: View {
                     Button { } label: { VStack { Image(systemName: "sparkles"); Text("星空") } }
                     Button { } label: { VStack { Image(systemName: "person.2"); Text("发现") } }
                     Button { } label: { VStack { Image(systemName: "message"); Text("消息") } }
-                    Button { } label: { VStack { Image(systemName: "person"); Text("我的") } }
+                    NavigationLink(destination: UserCenterView()) { VStack { Image(systemName: "person"); Text("我的") } }
                 }
                 .font(.caption).foregroundStyle(.white).padding(.vertical, 12)
             }
