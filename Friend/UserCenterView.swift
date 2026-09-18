@@ -47,4 +47,4 @@ struct UserCenterView: View {
     func logout() async { _ = try? await APIClient.shared.request(path:"token/logout",method:"DELETE",body:EmptyBody()) as EmptyResponse; TokenStore.shared.clear(); userInfo=nil; UserDefaults.standard.removeObject(forKey: Self.cacheKey) }
 }
 
-struct PersonalCenter:Decodable{let headPortrait:String?;let nickName:String?;let goldBalance:Int?;let city:String?;let blogCount:Int?;let followCount:Int?;let fansCount:Int?}
+struct PersonalCenter:Codable{let headPortrait:String?;let nickName:String?;let goldBalance:Int?;let city:String?;let blogCount:Int?;let followCount:Int?;let fansCount:Int?}
