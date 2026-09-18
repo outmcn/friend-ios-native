@@ -12,7 +12,8 @@ struct VideoMatchingView: View {
             ZStack {
                 Image("FriendVideoMatchingBg").resizable().scaledToFill().ignoresSafeArea()
                 VStack(spacing: 0) {
-                    HStack { Button { dismiss() } label: { Image(systemName: "chevron.left").font(.title2).foregroundStyle(.white) }; Spacer(); Text("视频匹配").font(.system(size: px(36,w), weight: .bold)).foregroundStyle(.white); Spacer(); Color.clear.frame(width: 28) }.padding(.horizontal, px(32,w)).padding(.top, proxy.safeAreaInsets.top + px(20,w))
+                    Color.clear.frame(height: proxy.safeAreaInsets.top + px(27,w))
+                    HStack { Button { dismiss() } label: { Image("FriendWhiteBack").resizable().scaledToFit().frame(width:px(44,w),height:px(44,w)) }; Spacer(); Text("视频匹配").font(.system(size: px(36,w), weight: .medium)).foregroundStyle(Color(red:0.87,green:0.89,blue:0.98)).shadow(color:.white.opacity(0.56),radius:px(10,w)); Spacer(); Color.clear.frame(width:px(44,w),height:px(44,w)) }.padding(.horizontal, px(32,w))
                     ZStack {
                         Image("FriendVideoMatchingRing").resizable().scaledToFit().frame(width: w, height: px(758,w))
                         Circle().fill(Color(red:0.57,green:0.62,blue:0.89)).frame(width:px(202,w),height:px(204,w)).overlay(Circle().stroke(Color(red:0.72,green:0.75,blue:0.93),lineWidth:px(10,w))).shadow(color:.indigo.opacity(0.7),radius:px(8,w))
