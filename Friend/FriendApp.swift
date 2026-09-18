@@ -10,8 +10,8 @@ struct FriendApp: App {
                 if TokenStore.shared.token == nil { LoginView() } else { HomeView() }
             }
             .preferredColorScheme(.dark)
-            .task { music.start(); location.refresh() }
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in location.refresh() }
+            .task { music.start(); location.refreshIfNeeded() }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in location.refreshIfNeeded() }
         }
     }
 }

@@ -4,6 +4,7 @@ struct UserCenterView: View {
     @StateObject private var model = UserCenterViewModel()
     @StateObject private var dynamics = UserCenterDynamicsViewModel()
     @State private var showLogin = false
+    @State private var cachedCity: String?
     let topSafeArea: CGFloat?
     private let designWidth: CGFloat = 750
     private func px(_ r: CGFloat, _ w: CGFloat) -> CGFloat { w * r / designWidth }
@@ -33,7 +34,8 @@ struct UserCenterView: View {
         }
         .navigationTitle("").navigationBarHidden(true)
         .sheet(isPresented: $showLogin) { NavigationView { LoginView() } }
-        .task { await loadAll() }
+        .task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }
+        .onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
     }
 
     private func loadAll() async { await model.loadIfNeeded(); await dynamics.load() }
@@ -56,7 +58,7 @@ struct UserCenterView: View {
     private func profile(_ info: PersonalCenter, width w: CGFloat) -> some View {
         HStack(spacing: px(24, w)) {
             VStack(alignment: .leading, spacing: px(18, w)) {
-                HStack(spacing: px(18, w)) { Text(info.nickName ?? "用户").font(.system(size: px(40, w), weight: .bold)).foregroundStyle(.white); Text(info.genderText).font(.system(size: px(25, w))).foregroundStyle(.pink); Text("地区：\(info.city ?? "未知")").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65)) }
+                HStack(spacing: px(18, w)) { Text(info.nickName ?? "用户").font(.system(size: px(40, w), weight: .bold)).foregroundStyle(.white); Text(info.genderText).font(.system(size: px(25, w))).foregroundStyle(.pink); Text("地区：\(info.city ?? cachedCity ?? "未知")").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65)) }
                 HStack(spacing: px(32, w)) { statValue("\(info.followCount ?? 0)", "关注", w); statValue("\(info.fansCount ?? 0)", "粉丝", w); statValue("\(info.likeCount ?? 0)", "赞", w) }
             }
             Spacer(minLength: 0); RemoteAvatar(urlString: info.headPortrait, size: px(140, w))
