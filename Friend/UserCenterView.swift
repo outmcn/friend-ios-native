@@ -40,13 +40,13 @@ struct UserCenterView: View {
     private func topBar(width w: CGFloat) -> some View {
         HStack {
             HStack(spacing: 0) {
-                Button { } label: { Image(systemName: "pencil") }
+                Button { } label: { ProfileActionIcon(kind: .pencil) }
                     .frame(width: px(59, w), height: px(60, w))
                 Spacer()
                 HStack(spacing: px(40, w)) {
-                    Button { } label: { Image(systemName: "pawprint") }
-                    Button { } label: { Image(systemName: "person.badge.plus") }
-                    NavigationLink { UserSettingsView() } label: { Image(systemName: "line.3.horizontal") }
+                    Button { } label: { ProfileActionIcon(kind: .footprints) }
+                    Button { } label: { ProfileActionIcon(kind: .addPerson) }
+                    NavigationLink { UserSettingsView() } label: { ProfileActionIcon(kind: .menu) }
                 }
                 .frame(height: px(60, w))
             }
