@@ -8,6 +8,7 @@ struct FriendApp: App {
             NavigationView {
                 if TokenStore.shared.token == nil { LoginView() } else { HomeView() }
             }
+            .preferredColorScheme(.dark)
             .task { music.start() }
         }
     }
