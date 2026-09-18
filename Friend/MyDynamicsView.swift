@@ -2,74 +2,23 @@ import SwiftUI
 
 struct MyDynamicsView: View {
     @StateObject private var model = MyDynamicsViewModel()
-    var body: some View {
-        ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
-            ScrollView {
-                LazyVStack(spacing: 14) {
-                    ForEach(model.items) { item in
-                        NavigationLink { DynamicDetailView(blog: item) } label: { card(item) }
-                            .buttonStyle(.plain)
-                    }
-                }.padding()
-            }
-        }
-        .navigationTitle("我的动态")
-        .navigationBarTitleDisplayMode(.inline)
-        .task { await model.load() }
-        .refreshable { await model.load() }
-    }
-    private func card(_ item: BlogPageResponse) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(item.pushTime ?? "").font(.caption).foregroundStyle(.secondary)
-            if let c = item.content, !c.isEmpty { Text(c).font(.body) }
-            if let imgs = item.images, !imgs.isEmpty { ForEach(imgs, id: \.self) { RemoteAvatar(urlString: $0, size: 180) } }
-            HStack { Label("\(item.fabulous ?? 0)", systemImage: "heart"); Label("\(item.comment ?? 0)", systemImage: "message") }
-                .font(.footnote).foregroundStyle(.secondary)
-        }.padding().frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemBackground)).clipShape(RoundedRectangle(cornerRadius: 14))
-    }
+    var body: some View { ZStack { Color(.systemGroupedBackground).ignoresSafeArea(); ScrollView { LazyVStack(spacing: 14) { ForEach(model.items) { item in NavigationLink { DynamicDetailView(blog: item) } label: { card(item) }.buttonStyle(.plain) }.padding() } } }.navigationTitle("我的动态").navigationBarTitleDisplayMode(.inline).task { await model.load() }.refreshable { await model.load() } }
+    private func card(_ item: BlogPageResponse) -> some View { VStack(alignment: .leading, spacing: 10) { Text(item.pushTime ?? "").font(.caption).foregroundStyle(.secondary); if let c = item.content, !c.isEmpty { Text(c).font(.body) }; if let imgs = item.images, !imgs.isEmpty { ForEach(imgs, id: \.self) { RemoteAvatar(urlString: $0, size: 180) } }; HStack { Label("\(item.fabulous ?? 0)", systemImage: "heart"); Label("\(item.comment ?? 0)", systemImage: "message") }.font(.footnote).foregroundStyle(.secondary) }.padding().frame(maxWidth: .infinity, alignment: .leading).background(Color(.secondarySystemBackground)).clipShape(RoundedRectangle(cornerRadius: 14)) }
 }
 
 struct DynamicDetailView: View {
     let blog: BlogPageResponse
     @StateObject private var model = DynamicDetailViewModel()
-    var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    HStack {
-                        RemoteAvatar(urlString: blog.headPortrait, size: 48)
-                        VStack(alignment: .leading) { Text(blog.nickName ?? "用户").font(.headline); Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.secondary) }
-                        Spacer()
-                        Menu { Button("删除动态", role: .destructive) { Task { await model.delete(blog) } } } label: { Image(systemName: "ellipsis") }
-                    }
-                    if let c = blog.content, !c.isEmpty { Text(c).font(.body) }
-                    if let imgs = blog.images, !imgs.isEmpty { ForEach(imgs, id: \.self) { RemoteAvatar(urlString: $0, size: 260) } }
-                    HStack { Button { Task { await model.toggleLike(blog) } } label: { Label("\(model.likeCount)", systemImage: model.liked ? "heart.fill" : "heart") }; Spacer() }.foregroundStyle(model.liked ? .red : .secondary)
-                    Divider(); Text("评论").font(.headline)
-                    ForEach(model.comments) { comment in CommentRow(comment: comment, canDelete: comment.userId == model.currentUserId, onReply: { model.replyTarget = comment }, onDelete: { Task { await model.deleteComment(comment, blogId: blog.id) } }) }
-                }.padding()
-            }
-            HStack { TextField(model.replyTarget == nil ? "写评论" : "回复 \(model.replyTarget?.nickName ?? "评论")", text: $model.commentText).textFieldStyle(.roundedBorder); Button("发送") { Task { await model.submit(blogId: blog.id) } } }.padding()
-        }
-        .navigationTitle("动态详情").navigationBarTitleDisplayMode(.inline)
-        .task { await model.load(blog: blog) }
-    }
+    var body: some View { VStack(spacing: 0) { ScrollView { VStack(alignment: .leading, spacing: 14) { HStack { RemoteAvatar(urlString: blog.headPortrait, size: 48); VStack(alignment: .leading) { Text(blog.nickName ?? "用户").font(.headline); Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.secondary) }; Spacer(); Menu { Button("删除动态", role: .destructive) { Task { await model.delete(blog) } } } label: { Image(systemName: "ellipsis") } }; if let c = blog.content, !c.isEmpty { Text(c).font(.body) }; if let imgs = blog.images, !imgs.isEmpty { ForEach(imgs, id: \.self) { RemoteAvatar(urlString: $0, size: 260) } }; HStack { Button { Task { await model.toggleLike(blog) } } label: { Label("\(model.likeCount)", systemImage: model.liked ? "heart.fill" : "heart") }; Spacer() }.foregroundStyle(model.liked ? .red : .secondary); Divider(); Text("评论").font(.headline); ForEach(model.comments) { comment in CommentRow(comment: comment, canDelete: comment.userId == model.currentUserId, onTap: { model.replyTarget = comment }) { Task { await model.deleteComment(comment, blogId: blog.id) } } } }.padding() }; HStack { TextField(model.replyTarget == nil ? "写评论" : "回复 \(model.replyTarget?.nickName ?? "评论")", text: $model.commentText).textFieldStyle(.roundedBorder); Button("发送") { Task { await model.submit(blogId: blog.id) } } }.padding() }.navigationTitle("动态详情").navigationBarTitleDisplayMode(.inline).task { await model.load(blog: blog) } }
 }
 
 struct CommentRow: View {
-    let comment: CommentItem; let canDelete: Bool; let onReply: () -> Void; let onDelete: () -> Void
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack { RemoteAvatar(urlString: comment.headPortrait, size: 36); VStack(alignment: .leading) { Text(comment.nickName ?? "用户").font(.subheadline.bold()); Text(comment.content ?? ""); Text("\(comment.pushTime ?? "")  地区：\(comment.city ?? "未知")").font(.caption).foregroundStyle(.secondary) }; Spacer(); if canDelete { Button("删除评论", role: .destructive, action: onDelete) } }
-            HStack { Button("回复", action: onReply).font(.caption); if let replies = comment.replies { ForEach(replies) { reply in Text("\(reply.nickName ?? "用户"): \(reply.content ?? "")").font(.caption).padding(.leading, 10) } } }
-        }.padding(.vertical, 10).overlay(alignment: .bottom) { Divider() }
-    }
+    let comment: CommentItem; let canDelete: Bool; let onTap: () -> Void; let onDelete: () -> Void
+    @State private var showMenu = false
+    var body: some View { VStack(alignment: .leading, spacing: 8) { HStack { RemoteAvatar(urlString: comment.headPortrait, size: 36); VStack(alignment: .leading) { Text(comment.nickName ?? "用户").font(.subheadline.bold()); Text(comment.content ?? ""); Text("\(comment.pushTime ?? "")  地区：\(comment.city ?? "未知")").font(.caption).foregroundStyle(.secondary) }; Spacer() }; if let replies = comment.replies { ForEach(replies) { reply in Text("\(reply.nickName ?? "用户"): \(reply.content ?? "")").font(.caption).padding(.leading, 46) } } }.padding(.vertical, 10).overlay(alignment: .bottom) { Divider() }.contentShape(Rectangle()).onTapGesture { onTap() }.onLongPressGesture { showMenu = true }.confirmationDialog("评论操作", isPresented: $showMenu) { Button("复制") { UIPasteboard.general.string = comment.content ?? "" }; Button("举报") { }; if canDelete { Button("删除", role: .destructive) { onDelete() } }; Button("取消", role: .cancel) { } } }
 }
 
-@MainActor final class DynamicDetailViewModel: ObservableObject {
-    @Published var comments: [CommentItem] = []; @Published var commentText = ""; @Published var liked = false; @Published var likeCount = 0; @Published var replyTarget: CommentItem?
+@MainActor final class DynamicDetailViewModel: ObservableObject { @Published var comments: [CommentItem] = []; @Published var commentText = ""; @Published var liked = false; @Published var likeCount = 0; @Published var replyTarget: CommentItem?
     var currentUserId: Int? { guard let data = UserDefaults.standard.data(forKey: "friend.user.center.cache"), let p = try? JSONDecoder().decode(PersonalCenter.self, from: data) else { return nil }; return p.id }
     func load(blog: BlogPageResponse) async { likeCount = blog.fabulous ?? 0; liked = blog.thumbsUp ?? false; await loadComments(blog.id) }
     func loadComments(_ id: Int) async { do { let r: APIEnvelope<PageResult<CommentItem>> = try await APIClient.shared.request(path: "community/frblog/blog/comment/page/\(id)", method: "GET", body: CommentsQuery(pageIndex: 1, pageSize: 100)); comments = r.data?.rows ?? [] } catch {} }
