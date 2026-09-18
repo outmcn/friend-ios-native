@@ -79,8 +79,29 @@ struct UserCenterView: View {
 
     private func stats(_ info: PersonalCenter, width w: CGFloat) -> some View { EmptyView() }
     private func statValue(_ value: String, _ title: String, _ w: CGFloat) -> some View { VStack(alignment: .leading, spacing: 2) { Text(value).font(.system(size: px(28, w), weight: .bold)).foregroundStyle(.white); Text(title).font(.system(size: px(22, w))).foregroundStyle(.white.opacity(0.62)) } }
-    private func dynamic(_ info: PersonalCenter, width w: CGFloat) -> some View { VStack(alignment: .leading, spacing: 12) { HStack { Text("我的动态").font(.system(size: px(32, w), weight: .bold)).foregroundStyle(.white); Spacer(); NavigationLink("查看全部") { MyDynamicsView() }.font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.7)) }; HStack(spacing: 12) { dynamicCard("动态 1", w); dynamicCard("动态 2", w) } }.padding(.top, px(54, w)).padding(.bottom, px(50, w)) }
-    private func dynamicCard(_ title: String, _ w: CGFloat) -> some View { VStack(alignment: .leading, spacing: 8) { RoundedRectangle(cornerRadius: 16).fill(Color.white.opacity(0.12)).frame(height: px(140, w)); Text(title).font(.system(size: 14)).foregroundStyle(.white.opacity(0.85)) }.frame(maxWidth: .infinity) }
+    private func dynamic(_ info: PersonalCenter, width w: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("我的动态").font(.system(size: px(32, w), weight: .bold)).foregroundStyle(.white)
+                Spacer()
+                if !(info.blog ?? []).isEmpty { NavigationLink("查看全部") { MyDynamicsView() }.font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.7)) }
+            }
+            if let blogs = info.blog, !blogs.isEmpty {
+                HStack(spacing: 12) {
+                    ForEach(blogs.prefix(2)) { blog in dynamicCard(blog, w) }
+                }
+            } else {
+                Text("暂无动态").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.6)).frame(maxWidth: .infinity, minHeight: px(100, w))
+            }
+        }.padding(.top, px(54, w)).padding(.bottom, px(50, w))
+    }
+    private func dynamicCard(_ blog: PersonalCenterBlog, _ w: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let image = blog.image, !image.isEmpty { RemoteAvatar(urlString: image, size: px(140, w)) }
+            Text(blog.content ?? "").font(.system(size: 14)).foregroundStyle(.white.opacity(0.85)).lineLimit(2)
+            Text(blog.time ?? "").font(.system(size: 12)).foregroundStyle(.white.opacity(0.55))
+        }.padding(10).frame(maxWidth: .infinity, minHeight: px(140, w), alignment: .topLeading).background(Color.white.opacity(0.12)).clipShape(RoundedRectangle(cornerRadius: 16))
+    }
 }
 
 @MainActor final class UserCenterViewModel: ObservableObject {
@@ -92,6 +113,17 @@ struct UserCenterView: View {
     func refresh() async { await load(force: true) }
 }
 
+struct PersonalCenterBlog: Codable, Identifiable {
+    let image: String?
+    let content: String?
+    let time: String?
+    private let idValue: Int
+    var id: Int { idValue }
+    enum CodingKeys: String, CodingKey { case id, image, content, time }
+    init(id: Int?, image: String?, content: String?, time: String?) { self.image = image; self.content = content; self.time = time; self.idValue = id ?? content?.hashValue ?? 0 }
+    init(from decoder: Decoder) throws { let c = try decoder.container(keyedBy: CodingKeys.self); let id = try c.decodeIfPresent(Int.self, forKey: .id); self.image = try c.decodeIfPresent(String.self, forKey: .image); self.content = try c.decodeIfPresent(String.self, forKey: .content); self.time = try c.decodeIfPresent(String.self, forKey: .time); self.idValue = id ?? content?.hashValue ?? 0 }
+    func encode(to encoder: Encoder) throws { var c = encoder.container(keyedBy: CodingKeys.self); try c.encode(idValue, forKey: .id); try c.encodeIfPresent(image, forKey: .image); try c.encodeIfPresent(content, forKey: .content); try c.encodeIfPresent(time, forKey: .time) }
+}
 struct PersonalCenter: Codable {
     let id: Int?
     let headPortrait: String?
@@ -103,5 +135,6 @@ struct PersonalCenter: Codable {
     let followCount: Int?
     let fansCount: Int?
     let likeCount: Int?
+    let blog: [PersonalCenterBlog]?
     var genderText: String { gender == "WOMAN" || gender == "女" ? "♀" : gender == "MAN" || gender == "男" ? "♂" : "" }
 }
