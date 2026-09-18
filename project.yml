@@ -16,6 +16,8 @@ targets:
     platform: iOS
     sources:
       - path: Friend
+        excludes:
+          - Resources/bgm.mp3
       - path: SourceReference
         type: folder
         buildPhase: none
