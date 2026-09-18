@@ -21,7 +21,7 @@ struct DynamicDetailView: View {
                     HStack { RemoteAvatar(urlString:blog.headPortrait,size:48); VStack(alignment:.leading){Text(blog.nickName ?? "用户").font(.headline);Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.secondary)}; Spacer(); Menu { Button("删除动态",role:.destructive){Task{await model.delete(blog)}} } label:{Image(systemName:"ellipsis")} }
                     if let c=blog.content,!c.isEmpty { Text(c) }
                     if let imgs=blog.images,!imgs.isEmpty { ForEach(imgs,id:\.self){RemoteAvatar(urlString:$0,size:260)} }
-                    HStack { Button { Task { await model.toggleLike(blog) } } label:{Label("\(model.likeCount)",systemImage:model.liked ? "heart.fill":"heart")}; Spacer() }.foregroundStyle(model.liked ? .red:.secondary)
+                    HStack { Button { Task { do { try await model.toggleLike(blog) } catch { actionError = error.localizedDescription } } } label:{Label("\(model.likeCount)",systemImage:model.liked ? "heart.fill":"heart")}; Spacer() }.foregroundStyle(model.liked ? .red:.secondary)
                     Divider(); Text("评论").font(.headline)
                     ForEach(model.comments){ comment in CommentRow(comment:comment,canDelete:true,onTap:{model.replyTarget=comment;inputFocused=true},onDelete:{Task{do{try await model.deleteComment(comment,blogId:blog.id)}catch{actionError=error.localizedDescription}}}) }
                 }.padding()
