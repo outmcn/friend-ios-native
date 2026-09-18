@@ -2,7 +2,10 @@ import SwiftUI
 
 struct MyDynamicsView: View {
     @StateObject private var model = MyDynamicsViewModel()
-    var body: some View { ZStack{Color(.systemGroupedBackground).ignoresSafeArea();ScrollView{LazyVStack(spacing:14){ForEach(model.items){item in NavigationLink{DynamicDetailView(blog:item)}label{card(item)}.buttonStyle(.plain)}}.padding()}}.navigationTitle("我的动态").navigationBarTitleDisplayMode(.inline).task{await model.load()}.refreshable{await model.load()} }
+    var body: some View { ZStack{Color(.systemGroupedBackground).ignoresSafeArea();ScrollView{LazyVStack(spacing:14){ForEach(model.items){ item in
+                NavigationLink { DynamicDetailView(blog: item) } label: { card(item) }
+                    .buttonStyle(.plain)
+            }}.padding()}}.navigationTitle("我的动态").navigationBarTitleDisplayMode(.inline).task{await model.load()}.refreshable{await model.load()} }
     private func card(_ item: BlogPageResponse)->some View { VStack(alignment:.leading,spacing:10){Text(item.pushTime ?? "").font(.caption).foregroundStyle(.secondary);if let c=item.content,!c.isEmpty{Text(c).font(.body)};if let imgs=item.images,!imgs.isEmpty{ForEach(imgs,id:\.self){RemoteAvatar(urlString:$0,size:180)}};HStack{Label("\(item.fabulous ?? 0)",systemImage:"heart");Label("\(item.comment ?? 0)",systemImage:"message")}.font(.footnote).foregroundStyle(.secondary)}.padding().frame(maxWidth:.infinity,alignment:.leading).background(Color(.secondarySystemBackground)).clipShape(RoundedRectangle(cornerRadius:14))}
 }
 
