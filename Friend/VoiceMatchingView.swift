@@ -42,8 +42,8 @@ struct VoiceMatchingView: View {
     private func voiceButton(title: String, type: String, width: CGFloat) -> some View {
         Button { Task { await model.start(type: type) } } label: {
             HStack(spacing: px(12,width)) { Image(systemName: "waveform").font(.system(size: px(25,width))); Text(title).font(.system(size:px(28,width),weight:.medium)) }
-                .foregroundStyle(Color(red:0.95,green:0.80,blue:0.38)).frame(maxWidth:.infinity).frame(height:px(74,width))
-                .background(Color(red:0.95,green:0.80,blue:0.38).opacity(0.18)).clipShape(Capsule()).overlay(Capsule().stroke(Color(red:0.95,green:0.80,blue:0.38),lineWidth:2))
+                .foregroundStyle(Color(red: 0.95, green: 0.80, blue: 0.38)).frame(maxWidth:.infinity).frame(height:px(74,width))
+                .background(Color(red: 0.95, green: 0.80, blue: 0.38).opacity(0.18)).clipShape(Capsule()).overlay(Capsule().stroke(Color(red: 0.95, green: 0.80, blue: 0.38),lineWidth:2))
         }
     }
 }
