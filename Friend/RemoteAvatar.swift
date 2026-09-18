@@ -20,7 +20,9 @@ struct AnimatedHomeBackground: UIViewRepresentable {
 }
 
 struct FriendHomeBackground: View {
-    var body: some View { AnimatedHomeBackground().ignoresSafeArea() }
+    var body: some View {
+        Color(red: 0.01, green: 0.04, blue: 0.07).ignoresSafeArea()
+    }
 }
 
 struct RemoteAvatar: View {

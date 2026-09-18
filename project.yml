@@ -18,6 +18,7 @@ targets:
       - path: Friend
         excludes:
           - Resources/bgm.mp3
+          - Resources/home.gif
       - path: SourceReference
         type: folder
         buildPhase: none
