@@ -10,7 +10,7 @@ struct NativeHomeView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let w = proxy.size.width, h = proxy.size.height
+            let w = proxy.size.width, h = proxy.size.height, bottom = proxy.safeAreaInsets.bottom
             ZStack(alignment: .topLeading) {
                 FriendHomeBackground()
                 tabContent(width: w, height: h, top: proxy.safeAreaInsets.top)
@@ -23,34 +23,34 @@ struct NativeHomeView: View {
 
     @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
         switch selectedTab {
-        case 1: sourceBlankTab(title: "发现", selected: 1, width: width, height: height)
-        case 2: sourceBlankTab(title: "消息", selected: 2, width: width, height: height)
-        case 3: sourceUserTab(width: width, height: height)
-        default: homeContent(width: width, height: height, top: top)
+        case 1: sourceBlankTab(title: "发现", selected: 1, width: width, height: height, bottomInset: bottom)
+        case 2: sourceBlankTab(title: "消息", selected: 2, width: width, height: height, bottomInset: bottom)
+        case 3: sourceUserTab(width: width, height: height, bottomInset: bottom)
+        default: homeContent(width: width, height: height, top: top, bottomInset: bottom)
         }
     }
 
-    private func sourceBlankTab(title: String, selected: Int, width: CGFloat, height: CGFloat) -> some View {
+    private func sourceBlankTab(title: String, selected: Int, width: CGFloat, height: CGFloat, bottomInset: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
             FriendHomeBackground()
             Text("").frame(maxWidth: .infinity, maxHeight: .infinity)
-            sourceTabBar(width: width, height: height)
+            sourceTabBar(width: width, height: height, bottomInset: bottomInset)
         }
     }
 
-    private func sourceUserTab(width: CGFloat, height: CGFloat) -> some View {
+    private func sourceUserTab(width: CGFloat, height: CGFloat, bottomInset: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
             Color(.systemGroupedBackground).ignoresSafeArea()
             UserCenterView()
-            sourceTabBar(width: width, height: height)
+            sourceTabBar(width: width, height: height, bottomInset: bottomInset)
         }
     }
 
-    private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
+    private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
             sourceHeader(width: width, top: top)
             sourceFunctionButtons(width: width, height: height)
-            sourceTabBar(width: width, height: height)
+            sourceTabBar(width: width, height: height, bottomInset: bottomInset)
         }
     }
 
@@ -82,8 +82,9 @@ struct NativeHomeView: View {
         VStack(spacing: px(28, width)) { Image(image).resizable().scaledToFit().frame(width: icon, height: icon); ZStack { Image("FriendTextBackground").resizable().scaledToFill(); Text(title).font(.system(size: px(32, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.56), radius: px(10, width)) }.frame(width: px(159, width), height: px(45, width)) }
     }
 
-    private func sourceTabBar(width: CGFloat, height: CGFloat) -> some View {
-        let barHeight = px(132, width), bottom: CGFloat = 0
+    private func sourceTabBar(width: CGFloat, height: CGFloat, bottomInset: CGFloat) -> some View {
+        let barHeight = px(132, width)
+        let bottom = max(0, bottomInset - px(6, width))
         return ZStack {
             Image("tabbarBackground").resizable().scaledToFit().frame(width: width, height: barHeight)
             HStack(spacing: 0) { sourceTab(0,"tabbar1White","tabbar1Black","星空",width); sourceTab(1,"tabbar2White","tabbar2Black","发现",width); sourceTab(2,"tabbar3White","tabbar3Black","消息",width); sourceTab(3,"tabbar4White","tabbar4Black","我的",width) }.padding(.horizontal, px(40,width)).frame(width: width,height: barHeight)
