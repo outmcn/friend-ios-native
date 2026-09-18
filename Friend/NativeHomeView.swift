@@ -14,6 +14,8 @@ struct NativeHomeView: View {
             ZStack(alignment: .topLeading) {
                 FriendHomeBackground().ignoresSafeArea()
                 tabContent(width: w, height: h, top: proxy.safeAreaInsets.top, bottomInset: bottom)
+                    .padding(.top, proxy.safeAreaInsets.top)
+                    .padding(.bottom, bottom)
             }
         }
         .ignoresSafeArea()
