@@ -21,7 +21,7 @@ struct MyDynamicsView: View {
     @Published var items: [BlogPageResponse] = []
     func load() async { do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: MyDynamicsPageQuery(pageIndex: 1, pageSize: 20)); items = r.data?.rows ?? [] } catch { items = [] } }
     func toggleLike(_ item: BlogPageResponse) async { _ = try? await APIClient.shared.request(path: "community/frblog/like/\(item.id)", method: "POST", body: EmptyBody()) as APIEnvelope<EmptyResponse>; await load() }
-    func delete(_ item: BlogPageResponse) async { _ = try? await APIClient.shared.request(path: "community/frblog/\(item.id)", method: "DELETE", body: EmptyBody()); await load() }
+    func delete(_ item: BlogPageResponse) async { let _: APIEnvelope<EmptyResponse>? = try? await APIClient.shared.request(path: "community/frblog/\(item.id)", method: "DELETE", body: EmptyBody()); await load() }
 }
 struct MyDynamicsPageQuery: Encodable { let pageIndex: Int; let pageSize: Int }
 
