@@ -14,8 +14,9 @@ struct NativeHomeView: View {
             ZStack(alignment: .topLeading) {
                 FriendHomeBackground()
                 tabContent(width: w, height: h, top: proxy.safeAreaInsets.top, bottomInset: bottom)
-            }.ignoresSafeArea()
+            }
         }
+        .ignoresSafeArea()
         .background(NavigationLink(destination: Text("视频匹配"), isActive: $showMatching) { EmptyView() })
         .task { await model.load() }
         .refreshable { await model.load() }
