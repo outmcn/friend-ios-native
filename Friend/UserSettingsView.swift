@@ -17,8 +17,7 @@ struct UserSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("确定退出登录吗？", isPresented: $logoutPending) {
             Button("退出登录", role: .destructive) {
-                TokenStore.shared.clear()
-                UserDefaults.standard.removeObject(forKey: "friend.user.center.cache")
+                SessionStore.shared.logout()
                 dismiss()
             }
         }
