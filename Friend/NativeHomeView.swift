@@ -9,7 +9,7 @@ struct NativeHomeView: View {
         GeometryReader { proxy in
             ZStack(alignment: .topLeading) {
                 FriendHomeBackground()
-                sourceHeader
+                sourceHeader(top: proxy.safeAreaInsets.top)
                 sourceFunctionButtons(width: proxy.size.width, height: proxy.size.height)
                 sourceTabBar(width: proxy.size.width, height: proxy.size.height)
             }
@@ -19,10 +19,9 @@ struct NativeHomeView: View {
         .refreshable { await model.load() }
     }
 
-    private var sourceHeader: some View {
+    private func sourceHeader(top: CGFloat) -> some View {
         VStack(spacing: 0) {
-            // Source status-bar component reserves only the system status-bar height.
-            Color.clear.frame(height: 27)
+            Color.clear.frame(height: top + 27)
             HStack(alignment: .top, spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("谈笑").font(.system(size: 24, weight: .bold)).foregroundStyle(Color(red: 0.87, green: 0.89, blue: 0.98))
