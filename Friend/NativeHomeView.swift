@@ -62,7 +62,7 @@ struct NativeHomeView: View {
     private func sourceFunction(image: String, title: String, width: CGFloat, icon: CGFloat) -> some View { VStack(spacing: px(28, width)) { Image(image).resizable().scaledToFit().frame(width: icon, height: icon); ZStack { Image("FriendTextBackground").resizable().scaledToFill(); Text(title).font(.system(size: px(32, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.56), radius: px(10, width)) }.frame(width: px(159, width), height: px(45, width)) } }
 
     private func sourceTabBar(width: CGFloat, height: CGFloat, bottomInset: CGFloat) -> some View {
-        let barHeight = px(132, width), bottom: CGFloat = 0
+        let barHeight = px(132, width), bottom: CGFloat = -px(34, width)
         return ZStack { Image("tabbarBackground").resizable().scaledToFit().frame(width: width, height: barHeight); HStack(spacing: 0) { sourceTab(0,"tabbar1White","tabbar1Black","星空",width); sourceTab(1,"tabbar2White","tabbar2Black","发现",width); sourceTab(2,"tabbar3White","tabbar3Black","消息",width); sourceTab(3,"tabbar4White","tabbar4Black","我的",width) }.padding(.horizontal, px(40,width)).frame(width: width,height: barHeight) }.frame(width: width,height: barHeight).position(x: width/2,y: height-bottom-barHeight/2)
     }
     private func sourceTab(_ i:Int,_ selected:String,_ normal:String,_ title:String,_ width:CGFloat)->some View { Button { selectedTab = i } label: { VStack(spacing:0) { Image(selectedTab==i ? selected:normal).resizable().scaledToFit().frame(width:px(44,width),height:px(44,width)); Text(title).font(.system(size:px(18,width),weight:.bold)).foregroundStyle(Color(red:0.82,green:0.87,blue:0.92)) }.frame(maxWidth:.infinity,maxHeight:.infinity) } }
