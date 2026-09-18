@@ -44,6 +44,8 @@ struct NativeHomeView: View {
             UserCenterView()
             sourceTabBar(width: width, height: height)
         }
+    }
+
     private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
             sourceHeader(width: width, top: top)
