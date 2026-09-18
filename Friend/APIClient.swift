@@ -39,7 +39,8 @@ final class APIClient {
         if method != "GET", let body { request.httpBody = try encoder.encode(body) }
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw APIError(statusCode: nil, message: "无效的服务器响应") }
-        guard (200..<300).contains(http.statusCode) else { throw APIError(statusCode: http.statusCode, message: String(data: data, encoding: .utf8) ?? "请求失败") }
+        let envelopeCode = (try? decoder.decode(APIEnvelope<EmptyResponse>.self, from: data))?.code
+        guard (200..<300).contains(http.statusCode), envelopeCode == nil || envelopeCode == 200 else { throw APIError(statusCode: envelopeCode ?? http.statusCode, message: String(data: data, encoding: .utf8) ?? "请求失败") }
         return try decoder.decode(Response.self, from: data)
     }
 
