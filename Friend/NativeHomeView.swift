@@ -13,7 +13,7 @@ struct NativeHomeView: View {
             let w = proxy.size.width, h = proxy.size.height, bottom = proxy.safeAreaInsets.bottom
             ZStack(alignment: .topLeading) {
                 FriendHomeBackground()
-                tabContent(width: w, height: h, top: proxy.safeAreaInsets.top)
+                tabContent(width: w, height: h, top: proxy.safeAreaInsets.top, bottomInset: bottom)
             }.ignoresSafeArea()
         }
         .background(NavigationLink(destination: Text("视频匹配"), isActive: $showMatching) { EmptyView() })
@@ -21,12 +21,12 @@ struct NativeHomeView: View {
         .refreshable { await model.load() }
     }
 
-    @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
+    @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
         switch selectedTab {
-        case 1: sourceBlankTab(title: "发现", selected: 1, width: width, height: height, bottomInset: bottom)
-        case 2: sourceBlankTab(title: "消息", selected: 2, width: width, height: height, bottomInset: bottom)
-        case 3: sourceUserTab(width: width, height: height, bottomInset: bottom)
-        default: homeContent(width: width, height: height, top: top, bottomInset: bottom)
+        case 1: sourceBlankTab(title: "发现", selected: 1, width: width, height: height, bottomInset: bottomInset)
+        case 2: sourceBlankTab(title: "消息", selected: 2, width: width, height: height, bottomInset: bottomInset)
+        case 3: sourceUserTab(width: width, height: height, bottomInset: bottomInset)
+        default: homeContent(width: width, height: height, top: top, bottomInset: bottomInset)
         }
     }
 
