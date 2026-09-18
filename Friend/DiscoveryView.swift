@@ -26,9 +26,9 @@ struct DiscoveryView: View {
                 else if let error = model.errorMessage { Text(error).foregroundStyle(.red) }
                 else { List(model.users) { user in Text(user.nickName ?? "用户") } }
             }
-            .navigationTitle("发现")
+            .navigationTitle("")
+            .navigationBarHidden(true)
             .task { await model.load() }
-            .refreshable { await model.load() }
         }
     }
 }

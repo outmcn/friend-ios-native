@@ -43,7 +43,8 @@ struct UserCenterView: View {
                 }.padding()
             }
         }
-        .navigationTitle("我的")
+        .navigationTitle("")
+        .navigationBarHidden(true)
         .sheet(isPresented: $showLogin) { NavigationView { LoginView() } }
         .task { await model.load() }
     }
