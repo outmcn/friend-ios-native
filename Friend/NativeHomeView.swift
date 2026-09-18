@@ -19,7 +19,7 @@ struct NativeHomeView: View {
             }
         }
         .ignoresSafeArea()
-        .background(NavigationLink(destination: VideoMatchingView(), isActive: $showMatching) { EmptyView() })
+        .background(NavigationLink(destination: VoiceMatchingView(), isActive: $showMatching) { EmptyView() })
         .task { await model.load() }
         .refreshable { await model.load() }
     }
@@ -60,7 +60,7 @@ struct NativeHomeView: View {
 
     private func sourceFunctionButtons(width: CGFloat, height: CGFloat) -> some View {
         let icon = px(128, width), groupHeight = icon + px(28, width) + px(45, width)
-        return HStack(spacing: 0) { Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2); Button { } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
+        return HStack(spacing: 0) { Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "语音匹配", width: width, icon: icon) }.frame(width: width / 2); Button { } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
     }
     private func sourceFunction(image: String, title: String, width: CGFloat, icon: CGFloat) -> some View { VStack(spacing: px(28, width)) { Image(image).resizable().scaledToFit().frame(width: icon, height: icon); ZStack { Image("FriendTextBackground").resizable().scaledToFill(); Text(title).font(.system(size: px(32, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.56), radius: px(10, width)) }.frame(width: px(159, width), height: px(45, width)) } }
 
