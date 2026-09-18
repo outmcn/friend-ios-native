@@ -23,7 +23,7 @@ struct LoginView: View {
             }
         }.navigationBarHidden(true).background(NavigationLink(destination: HomeView(), isActive: $showHome) { EmptyView() }).sheet(isPresented: $showRegister) { NavigationView { RegisterView() } }
     }
-    private func loginField(label: String, text: Binding<String>, secure: Bool) -> some View -> some View {
+    private func loginField(label: String, text: Binding<String>, secure: Bool) -> some View {
         HStack(spacing: 12) { Text(label).font(.system(size: 15, weight: .bold)).foregroundStyle(Color(red:0.31,green:0.33,blue:0.53)).frame(width: 48, alignment: .leading); if secure { SecureField("请输入", text: text) } else { TextField("请输入", text: text).textInputAutocapitalization(.never).autocorrectionDisabled() } }.padding(.horizontal, 18).frame(height: 44).background(Color.white.opacity(0.92)).clipShape(Capsule()).overlay(Capsule().stroke(Color(red:0.31,green:0.33,blue:0.53),lineWidth: 1)).padding(.bottom, 16)
     }
 }
