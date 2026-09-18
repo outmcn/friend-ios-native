@@ -39,17 +39,20 @@ struct UserCenterView: View {
 
     private func topBar(width w: CGFloat) -> some View {
         HStack {
-            Button { } label: { Image(systemName: "pencil") }
-                .font(.system(size: px(32, w), weight: .medium))
-                .foregroundStyle(.white)
-            Spacer()
-            HStack(spacing: px(28, w)) {
-                Button { } label: { Image(systemName: "person.crop.circle.badge.clock") }
-                Button { } label: { Image(systemName: "person.badge.plus") }
-                NavigationLink { UserSettingsView() } label: { Image(systemName: "line.3.horizontal") }
+            HStack(spacing: 0) {
+                Button { } label: { Image(systemName: "pencil") }
+                    .frame(width: px(59, w), height: px(60, w))
+                Spacer()
+                HStack(spacing: px(40, w)) {
+                    Button { } label: { Image(systemName: "pawprint") }
+                    Button { } label: { Image(systemName: "person.badge.plus") }
+                    NavigationLink { UserSettingsView() } label: { Image(systemName: "line.3.horizontal") }
+                }
+                .frame(height: px(60, w))
             }
             .font(.system(size: px(32, w), weight: .medium))
-            .foregroundStyle(.white)
+            .foregroundStyle(Color(white: 0.96))
+            .frame(height: px(60, w))
         }
         .frame(height: px(52, w))
     }
