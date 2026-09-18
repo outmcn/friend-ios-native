@@ -23,13 +23,27 @@ struct NativeHomeView: View {
 
     @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
         switch selectedTab {
-        case 1: DiscoveryView()
-        case 2: Text("消息").foregroundStyle(.white).font(.title)
-        case 3: UserCenterView()
+        case 1: sourceBlankTab(title: "发现", selected: 1, width: width, height: height)
+        case 2: sourceBlankTab(title: "消息", selected: 2, width: width, height: height)
+        case 3: sourceUserTab(width: width, height: height)
         default: homeContent(width: width, height: height, top: top)
         }
     }
 
+    private func sourceBlankTab(title: String, selected: Int, width: CGFloat, height: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            FriendHomeBackground()
+            Text("").frame(maxWidth: .infinity, maxHeight: .infinity)
+            sourceTabBar(width: width, height: height)
+        }
+    }
+
+    private func sourceUserTab(width: CGFloat, height: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            Color(.systemGroupedBackground).ignoresSafeArea()
+            UserCenterView()
+            sourceTabBar(width: width, height: height)
+        }
     private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
             sourceHeader(width: width, top: top)
