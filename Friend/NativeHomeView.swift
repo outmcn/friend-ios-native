@@ -19,7 +19,6 @@ struct NativeHomeView: View {
         }
         .task { await model.load() }
         .refreshable { await model.load() }
-        .toolbar(.hidden, for: .navigationBar)
     }
 
     private var topBar: some View {
