@@ -27,6 +27,7 @@ struct UserCenterView: View {
 @MainActor final class UserCenterDynamicsViewModel: ObservableObject {
     @Published var items: [BlogPageResponse] = []
     @Published var errorMessage: String?
+    @Published var likeError: String?
     private let cacheKey = "friend.user.dynamics.cache"
     init() { if let data = UserDefaults.standard.data(forKey: cacheKey), let cached = try? JSONDecoder().decode([BlogPageResponse].self, from: data) { items = cached } }
     func loadIfNeeded() async { guard items.isEmpty else { return }; await load() }
@@ -34,7 +35,7 @@ struct UserCenterView: View {
         do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: UserCenterPageQuery(pageIndex: 1, pageSize: 100)); guard let rows = r.data?.rows else { throw APIError(statusCode: nil, message: r.msg ?? "动态数据为空") }; items = rows; if let data = try? JSONEncoder().encode(rows) { UserDefaults.standard.set(data, forKey: cacheKey) }; errorMessage = nil }
         catch { errorMessage = error.localizedDescription }
     }
-    func toggleLike(_ item: BlogPageResponse) async throws { let r: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "community/frblog/like/\(item.id)", method: "POST", body: EmptyBody()); guard r.code == 200 else { throw APIError(statusCode: r.code, message: r.msg ?? "点赞失败") }; await load() }
+    func toggleLike(_ item: BlogPageResponse) async throws { let r: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "community/frblog/like/\(item.id)", method: "POST", body: EmptyBody()); guard r.code == 200 else { throw APIError(statusCode: r.code, message: r.msg ?? "点赞失败") }; try await load() }
 }
 struct UserCenterPageQuery: Encodable { let pageIndex: Int; let pageSize: Int }
 @MainActor final class UserCenterViewModel: ObservableObject { @Published var userInfo: PersonalCenter?; @Published var errorMessage: String?; private static let cacheKey = "friend.user.center.cache"; func loadIfNeeded() async { guard TokenStore.shared.token != nil else { return }; if userInfo == nil, let data = UserDefaults.standard.data(forKey: Self.cacheKey), let cached = try? JSONDecoder().decode(PersonalCenter.self, from: data) { userInfo = cached }; guard userInfo == nil else { return }; await load(force: true) }; func load(force: Bool = false) async { guard TokenStore.shared.token != nil else { return }; if !force, userInfo != nil { return }; do { let r: APIEnvelope<PersonalCenter> = try await APIClient.shared.request(path: "community/fruser/personalCenter", method: "GET", body: EmptyBody()); userInfo = r.data; if let info = r.data, let data = try? JSONEncoder().encode(info) { UserDefaults.standard.set(data, forKey: Self.cacheKey) } } catch { errorMessage = error.localizedDescription } }; func refresh() async { await load(force: true) } }
