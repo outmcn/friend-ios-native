@@ -10,7 +10,7 @@ struct UserCenterView: View {
             let w=proxy.size.width
             ZStack { Image("FriendUserIndex").resizable().scaledToFill().ignoresSafeArea(); Color.black.opacity(0.1).ignoresSafeArea(); ScrollView(showsIndicators:false){ VStack(spacing:0){
                 Color.clear.frame(height:proxy.safeAreaInsets.top+px(88,w))
-                if let info=model.userInfo { VStack(spacing:0) { profile(info,width:w); stats(info,width:w) }.padding(.horizontal,px(22,w)).padding(.vertical,px(22,w)).background(Image("tabbarBackground").resizable().scaledToFill().clipped()).clipShape(RoundedRectangle(cornerRadius:px(28,w))).overlay(RoundedRectangle(cornerRadius:px(28,w)).stroke(Color.white.opacity(0.22),lineWidth:1)); dynamic(info,width:w) } else { Button("请登录"){showLogin=true}.foregroundStyle(.white).padding(.top,100) }
+                if let info=model.userInfo { profile(info,width:w); stats(info,width:w); dynamic(info,width:w) } else { Button("请登录"){showLogin=true}.foregroundStyle(.white).padding(.top,100) }
                 userCenterList(width:w)
                 Color.clear.frame(height:120)
             }.padding(.horizontal,px(32,w)) } }
