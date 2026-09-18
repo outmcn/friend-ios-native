@@ -1,16 +1,4 @@
 import SwiftUI
-import UIKit
-
-struct AnimatedVideoBackground: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIImageView {
-        let view = UIImageView(); view.contentMode = .scaleAspectFill; view.clipsToBounds = true
-        guard let url = Bundle.main.url(forResource: "video", withExtension: "gif"), let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return view }
-        view.animationImages = (0..<CGImageSourceGetCount(source)).compactMap { i in guard let image = CGImageSourceCreateImageAtIndex(source, i, nil) else { return nil }; return UIImage(cgImage: image) }
-        view.animationDuration = 13.5; view.animationRepeatCount = 0; view.startAnimating(); return view
-    }
-    func updateUIView(_ uiView: UIImageView, context: Context) {}
-}
-
 struct VideoMatchingView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var model = VideoMatchingViewModel()
@@ -21,7 +9,7 @@ struct VideoMatchingView: View {
         GeometryReader { proxy in
             let w = proxy.size.width
             ZStack {
-                AnimatedVideoBackground().ignoresSafeArea()
+                Color(red: 0.01, green: 0.04, blue: 0.07).ignoresSafeArea()
                 VStack(spacing: 0) {
                     Color.clear.frame(height: proxy.safeAreaInsets.top)
                     HStack { Button { dismiss() } label: { Image("FriendWhiteBack").resizable().scaledToFit().frame(width:px(44,w),height:px(44,w)) }; Spacer(); Text("视频匹配").font(.system(size: px(36,w), weight: .medium)).foregroundStyle(Color(red:0.87,green:0.89,blue:0.98)).shadow(color:.white.opacity(0.56),radius:px(10,w)); Spacer(); Color.clear.frame(width:px(44,w),height:px(44,w)) }.padding(.horizontal, px(32,w))

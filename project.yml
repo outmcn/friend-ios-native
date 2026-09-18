@@ -19,6 +19,7 @@ targets:
         excludes:
           - Resources/bgm.mp3
           - Resources/home.gif
+          - Resources/video.gif
       - path: SourceReference
         type: folder
         buildPhase: none

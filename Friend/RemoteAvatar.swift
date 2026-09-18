@@ -1,28 +1,8 @@
 import SwiftUI
 import UIKit
 
-struct AnimatedHomeBackground: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIImageView {
-        let view = UIImageView()
-        view.contentMode = .scaleAspectFill
-        view.clipsToBounds = true
-        view.animationImages = loadFrames()
-        view.animationDuration = 13.5
-        view.animationRepeatCount = 0
-        view.startAnimating()
-        return view
-    }
-    func updateUIView(_ uiView: UIImageView, context: Context) {}
-    private func loadFrames() -> [UIImage] {
-        guard let url = Bundle.main.url(forResource: "home", withExtension: "gif"), let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return [] }
-        return (0..<CGImageSourceGetCount(source)).compactMap { UIImage(cgImage: CGImageSourceCreateImageAtIndex(source, $0, nil)!) }
-    }
-}
-
 struct FriendHomeBackground: View {
-    var body: some View {
-        Color(red: 0.01, green: 0.04, blue: 0.07).ignoresSafeArea()
-    }
+    var body: some View { Color(red: 0.01, green: 0.04, blue: 0.07).ignoresSafeArea() }
 }
 
 struct RemoteAvatar: View {
