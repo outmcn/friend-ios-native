@@ -28,7 +28,7 @@ struct NativeHomeView: View {
         switch selectedTab {
         case 1: sourceBlankTab(width: width, height: height, bottomInset: bottomInset)
         case 2: sourceBlankTab(width: width, height: height, bottomInset: bottomInset)
-        case 3: sourceUserTab(width: width, height: height, bottomInset: bottomInset)
+        case 3: sourceUserTab(width: width, height: height, top: top, bottomInset: bottomInset)
         default: homeContent(width: width, height: height, top: top, bottomInset: bottomInset)
         }
     }
@@ -37,8 +37,8 @@ struct NativeHomeView: View {
         ZStack(alignment: .topLeading) { Color.clear; sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
     }
 
-    private func sourceUserTab(width: CGFloat, height: CGFloat, bottomInset: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) { UserCenterView(); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
+    private func sourceUserTab(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) { UserCenterView(topSafeArea: top); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
     }
 
     private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {

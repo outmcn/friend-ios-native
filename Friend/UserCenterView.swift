@@ -2,6 +2,7 @@ import SwiftUI
 
 struct UserCenterView: View {
     @StateObject private var model = UserCenterViewModel()
+    let topSafeArea: CGFloat?
     @State private var showLogin = false
     private let designWidth: CGFloat = 750
     private func px(_ r: CGFloat, _ w: CGFloat) -> CGFloat { w * r / designWidth }
@@ -14,7 +15,7 @@ struct UserCenterView: View {
                 Color.black.opacity(0.1).ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        Color.clear.frame(height: proxy.safeAreaInsets.top)
+                        Color.clear.frame(height: (topSafeArea ?? proxy.safeAreaInsets.top) + px(24, w))
                         topBar(width: w)
                         if let info = model.userInfo {
                             profile(info, width: w)
