@@ -16,8 +16,9 @@ targets:
     platform: iOS
     sources:
       - path: Friend
-        excludes:
-          - Assets.xcassets/FriendAssets.imageset/home.gif
+      - path: SourceReference
+        type: folder
+        buildPhase: none
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.outmcn.Friend
