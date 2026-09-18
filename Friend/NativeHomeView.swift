@@ -13,7 +13,7 @@ struct NativeHomeView: View {
                     topBar.padding(.top, proxy.safeAreaInsets.top)
                     Spacer(minLength: 0)
                     mainActions
-                        .offset(y: -72)
+                        .offset(y: -150)
                     Spacer(minLength: 0)
                     bottomBar(proxy: proxy)
                 }
