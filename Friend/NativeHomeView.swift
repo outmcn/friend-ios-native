@@ -32,8 +32,7 @@ struct NativeHomeView: View {
 
     private func sourceBlankTab(title: String, selected: Int, width: CGFloat, height: CGFloat, bottomInset: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
-            FriendHomeBackground()
-            Text("").frame(maxWidth: .infinity, maxHeight: .infinity)
+            Color.clear
             sourceTabBar(width: width, height: height, bottomInset: bottomInset)
         }
     }
