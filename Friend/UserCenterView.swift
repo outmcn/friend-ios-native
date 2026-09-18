@@ -76,7 +76,7 @@ struct UserCenterView: View {
     private func blogCard(_ blog: BlogPageResponse, _ w: CGFloat) -> some View {
         NavigationLink { DynamicDetailView(blog: blog) } label: {
                 VStack(alignment: .leading, spacing: 10) {
-            HStack { RemoteAvatar(urlString: blog.headPortrait, size: 42); VStack(alignment: .leading) { Text(blog.nickName ?? model.userInfo?.nickName ?? "用户").font(.headline); Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.white.opacity(0.6)) }; Spacer() }
+            HStack { Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.white.opacity(0.6)); Spacer() }
             if let content = blog.content, !content.isEmpty { Text(content).font(.system(size: 16)).foregroundStyle(.white) }
             if let images = blog.images { ForEach(images, id: \.self) { image in RemoteAvatar(urlString: image, size: px(180, w)) } }
             HStack { Label("\(blog.fabulous ?? 0)", systemImage: "heart"); Label("\(blog.comment ?? 0)", systemImage: "message") }.font(.footnote).foregroundStyle(.white.opacity(0.75))
@@ -89,7 +89,6 @@ struct UserCenterView: View {
     @Published var items: [BlogPageResponse] = []
     func load() async { do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: UserCenterPageQuery(pageIndex: 1, pageSize: 100)); items = r.data?.rows ?? [] } catch { items = [] } }
     func toggleLike(_ item: BlogPageResponse) async { let _: APIEnvelope<EmptyResponse>? = try? await APIClient.shared.request(path: "community/frblog/like/\(item.id)", method: "POST", body: EmptyBody()); await load() }
-    func delete(_ item: BlogPageResponse) async { let _: APIEnvelope<EmptyResponse>? = try? await APIClient.shared.request(path: "community/frblog/\(item.id)", method: "DELETE", body: EmptyBody()); await load() }
 }
 
 struct UserCenterPageQuery: Encodable { let pageIndex: Int; let pageSize: Int }
