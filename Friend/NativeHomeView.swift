@@ -10,7 +10,7 @@ struct NativeHomeView: View {
             ZStack {
                 FriendHomeBackground()
                 VStack(spacing: 0) {
-                    topBar.padding(.top, proxy.safeAreaInsets.top)
+                    topBar.padding(.top, 0)
                     Spacer(minLength: 0)
                     mainActions
                         .offset(y: -150)
