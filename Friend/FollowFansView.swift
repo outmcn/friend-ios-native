@@ -4,18 +4,68 @@ struct FollowFansView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var model = FollowFansViewModel()
     @State private var tab = 0
+
     var body: some View {
-        ZStack { Color(.systemGroupedBackground).ignoresSafeArea(); VStack(spacing: 0) {
-            HStack { Button { dismiss() } label: { Image(systemName: "chevron.left").font(.system(size: 18, weight: .semibold)) }; Spacer(); Text(tab == 0 ? "关注列表" : "粉丝列表").font(.system(size: 17, weight: .semibold)); Spacer(); Color.clear.frame(width: 22) }.foregroundStyle(.primary).padding(.horizontal, 20).padding(.top, 0)
-            HStack(spacing: 0) { tabButton("关注列表", 0); tabButton("粉丝列表", 1) }.background(.background)
-            ScrollView { LazyVStack(spacing: 0) { ForEach(model.items) { item in row(item) } } }.refreshable { await model.load(tab: tab) }
-        } }
-        .navigationTitle("").navigationBarHidden(true)
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                tabButton("关注列表", 0)
+                tabButton("粉丝列表", 1)
+            }
+            .background(Color(.systemBackground))
+
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    ForEach(model.items) { item in row(item) }
+                }
+            }
+            .refreshable { await model.load(tab: tab) }
+        }
+        .background(Color(.systemBackground).ignoresSafeArea())
+        .navigationTitle(tab == 0 ? "关注列表" : "粉丝列表")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button { dismiss() } label: {
+                    Image(systemName: "chevron.left")
+                }
+                .accessibilityLabel("返回")
+            }
+        }
         .onChange(of: tab) { _ in Task { await model.load(tab: tab) } }
         .task { await model.load(tab: tab) }
     }
-    private func tabButton(_ title: String, _ value: Int) -> some View { Button { tab = value } label: { Text(title).font(.system(size: value == tab ? 16 : 14, weight: value == tab ? .bold : .regular)).foregroundStyle(value == tab ? .primary : .secondary).frame(maxWidth: .infinity).frame(height: 52).overlay(alignment: .bottom) { if value == tab { Color.primary.frame(height: 2) } } } }
-    private func row(_ item: FollowItem) -> some View { HStack(spacing: 12) { RemoteAvatar(urlString: item.headPortrait, size: 51); VStack(alignment: .leading, spacing: 5) { Text(item.nickName ?? "用户").font(.system(size: 16, weight: .medium)); Text(item.city ?? "").font(.system(size: 14)).foregroundStyle(Color(red: 0.95, green: 0.80, blue: 0.38)) }; Spacer(); Button(model.buttonTitle(item)) { Task { await model.action(item) } }.frame(width: 80, height: 30).background(Color(red: 0.95, green: 0.80, blue: 0.38)).clipShape(Capsule()).foregroundStyle(.black) }.padding(.horizontal, 30).frame(height: 80).overlay(alignment: .bottom) { Color(.systemGray6).frame(height: 1) } }
+
+    private func tabButton(_ title: String, _ value: Int) -> some View {
+        Button { tab = value } label: {
+            Text(title)
+                .font(.system(size: value == tab ? 16 : 14, weight: value == tab ? .bold : .regular))
+                .foregroundStyle(value == tab ? .primary : .secondary)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .overlay(alignment: .bottom) {
+                    if value == tab { Color.primary.frame(height: 2) }
+                }
+        }
+    }
+
+    private func row(_ item: FollowItem) -> some View {
+        HStack(spacing: 12) {
+            RemoteAvatar(urlString: item.headPortrait, size: 51)
+            VStack(alignment: .leading, spacing: 5) {
+                Text(item.nickName ?? "用户").font(.system(size: 16, weight: .medium))
+                Text(item.city ?? "").font(.system(size: 14)).foregroundStyle(Color(red: 0.95, green: 0.80, blue: 0.38))
+            }
+            Spacer()
+            Button(model.buttonTitle(item)) { Task { await model.action(item) } }
+                .frame(width: 80, height: 30)
+                .background(Color(red: 0.95, green: 0.80, blue: 0.38))
+                .clipShape(Capsule())
+                .foregroundStyle(.black)
+        }
+        .padding(.horizontal, 30)
+        .frame(height: 80)
+        .overlay(alignment: .bottom) { Color(.systemGray6).frame(height: 1) }
+    }
 }
 
 @MainActor final class FollowFansViewModel: ObservableObject {
