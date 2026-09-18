@@ -3,6 +3,7 @@ import SwiftUI
 struct FollowFansView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var model = FollowFansViewModel()
+    @State private var tab = 0
     var body: some View {
         ZStack { Color(.systemGroupedBackground).ignoresSafeArea(); VStack(spacing: 0) {
             HStack { Button { dismiss() } label: { Image(systemName: "chevron.left").font(.system(size: 18, weight: .semibold)) }; Spacer(); Text(tab == 0 ? "关注列表" : "粉丝列表").font(.system(size: 17, weight: .semibold)); Spacer(); Color.clear.frame(width: 22) }.foregroundStyle(.primary).padding(.horizontal, 20).padding(.top, 12)
