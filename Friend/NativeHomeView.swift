@@ -67,7 +67,7 @@ struct NativeHomeView: View {
         let icon = px(128, width: width)
         let title = px(32, width: width)
         let groupHeight = icon + px(28, width: width) + title
-        HStack(spacing: 0) {
+        return HStack(spacing: 0) {
             Button { } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }
                 .frame(width: width / 2)
             Button { } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }
@@ -92,7 +92,7 @@ struct NativeHomeView: View {
     private func sourceTabBar(width: CGFloat, height: CGFloat) -> some View {
         let barHeight = px(132, width: width)
         let bottom = px(48, width: width)
-        ZStack {
+        return ZStack {
             // Source uses background-size: contain, not fill/crop.
             Image("tabbarBackground").resizable().scaledToFit().frame(width: width, height: barHeight)
             HStack(spacing: 0) {
