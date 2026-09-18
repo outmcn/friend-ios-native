@@ -54,7 +54,7 @@ struct NativeHomeView: View {
 
     private func sourceTabBar(width: CGFloat, height: CGFloat) -> some View {
         let barHeight = width * 0.176
-        let bottom = width * 0.064
+        let bottom: CGFloat = 0
         return ZStack {
             Image("tabbarBackground").resizable().scaledToFill().frame(width: width, height: barHeight).clipped()
             HStack(spacing: 0) {
