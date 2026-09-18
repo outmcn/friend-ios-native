@@ -19,7 +19,7 @@ struct NativeHomeView: View {
             }
         }
         .ignoresSafeArea()
-        .background(NavigationLink(destination: Text("视频匹配"), isActive: $showMatching) { EmptyView() })
+        .background(NavigationLink(destination: VideoMatchingView(), isActive: $showMatching) { EmptyView() })
         .task { await model.load() }
         .refreshable { await model.load() }
     }
