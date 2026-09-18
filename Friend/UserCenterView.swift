@@ -36,7 +36,6 @@ struct UserCenterView: View {
         .task { await loadAll() }
     }
 
-    private var topSafeArea: CGFloat? { nil }
     private func loadAll() async { await model.loadIfNeeded(); await dynamics.load() }
     private func refreshAll() async { await model.refresh(); await dynamics.load() }
 
@@ -86,10 +85,10 @@ struct UserCenterView: View {
 
 @MainActor final class UserCenterDynamicsViewModel: ObservableObject {
     @Published var items: [BlogPageResponse] = []
-    func load() async { do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: PageQuery(pageIndex: 1, pageSize: 100)); items = r.data?.rows ?? [] } catch { items = [] } }
+    func load() async { do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: UserCenterPageQuery(pageIndex: 1, pageSize: 100)); items = r.data?.rows ?? [] } catch { items = [] } }
 }
 
-struct PageQuery: Encodable { let pageIndex: Int; let pageSize: Int }
+struct UserCenterPageQuery: Encodable { let pageIndex: Int; let pageSize: Int }
 
 @MainActor final class UserCenterViewModel: ObservableObject {
     @Published var userInfo: PersonalCenter?

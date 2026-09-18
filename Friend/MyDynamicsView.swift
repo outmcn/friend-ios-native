@@ -20,6 +20,6 @@ struct MyDynamicsView: View {
 
 @MainActor final class MyDynamicsViewModel: ObservableObject {
     @Published var items: [BlogPageResponse] = []
-    func load() async { do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: PageQuery()); items = r.data?.rows ?? [] } catch { items = [] } }
+    func load() async { do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: PageQuery(pageIndex: 1, pageSize: 20)); items = r.data?.rows ?? [] } catch { items = [] } }
 }
 struct PageQuery: Encodable { let pageIndex = 1; let pageSize = 20 }
