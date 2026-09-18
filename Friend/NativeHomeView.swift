@@ -2,7 +2,7 @@ import SwiftUI
 
 struct NativeHomeView: View {
     @StateObject private var model = DiscoveryViewModel()
-    @State private var musicOn = true
+    @StateObject private var music = BackgroundMusicPlayer.shared
     @State private var selectedTab = 0
     @State private var showMatching = false
     private let designWidth: CGFloat = 750
@@ -63,7 +63,7 @@ struct NativeHomeView: View {
                 }
                 Spacer()
                 HStack(spacing: px(20, width)) {
-                    Button { musicOn.toggle() } label: { Image(musicOn ? "FriendMusicWhite" : "FriendMusicBlack").resizable().scaledToFit().frame(width: px(54, width), height: px(54, width)) }
+                    Button { music.toggle() } label: { Image(music.isPlaying ? "FriendMusicWhite" : "FriendMusicBlack").resizable().scaledToFit().frame(width: px(54, width), height: px(54, width)) }
                     Button { } label: { HStack(spacing: px(8, width)) { Image("FriendScreen").resizable().scaledToFit().frame(width: px(20, width), height: px(20, width)); Text("筛选").font(.system(size: px(24, width))) }.foregroundStyle(.white).frame(width: px(120, width), height: px(54, width)).background(Image("FriendScreenBackground").resizable().scaledToFill()).clipShape(Capsule()).overlay(Capsule().stroke(.white, lineWidth: px(2, width))) }
                 }
             }.padding(.horizontal, px(56, width))
