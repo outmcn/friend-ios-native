@@ -12,11 +12,12 @@ struct NativeHomeView: View {
         GeometryReader { proxy in
             let w = proxy.size.width, h = proxy.size.height, bottom = proxy.safeAreaInsets.bottom
             ZStack(alignment: .topLeading) {
-                FriendHomeBackground()
+                FriendHomeBackground().ignoresSafeArea()
                 tabContent(width: w, height: h, top: proxy.safeAreaInsets.top, bottomInset: bottom)
+                    .padding(.top, proxy.safeAreaInsets.top)
+                    .padding(.bottom, bottom)
             }
         }
-        .ignoresSafeArea()
         .background(NavigationLink(destination: Text("视频匹配"), isActive: $showMatching) { EmptyView() })
         .task { await model.load() }
         .refreshable { await model.load() }
