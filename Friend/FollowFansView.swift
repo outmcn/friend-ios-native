@@ -21,7 +21,7 @@ struct FollowFansView: View {
             .refreshable { await model.load(tab: tab) }
         }
         .background(Color(.systemBackground).ignoresSafeArea())
-        .navigationTitle(tab == 0 ? "关注列表" : "粉丝列表")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
