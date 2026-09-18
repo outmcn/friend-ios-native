@@ -1,74 +1,29 @@
-import Foundation
 import SwiftUI
-
-@MainActor
-final class RegisterViewModel: ObservableObject {
-    @Published var phone = ""; @Published var code = ""; @Published var gender = "male"
-    @Published var nickname = ""; @Published var birthday = ""; @Published var city = ""
-    @Published var cityCode = "0"; @Published var latitude = ""; @Published var longitude = ""
-    @Published var password = ""; @Published var confirmPassword = ""; @Published var avatarData: Data?
-    @Published var isLoading = false; @Published var errorMessage: String?; @Published var stage = 1
-
-    func verifyCode() async {
-        guard !phone.isEmpty, !code.isEmpty else { errorMessage = "请输入手机号和验证码"; return }
-        do {
-            let _: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "token/checksms", method: "POST", body: ["messageType":"REGISTER", "phone":phone, "code":code])
-            stage = 2
-        } catch { errorMessage = error.localizedDescription }
-    }
-
-    func register() async -> Bool {
-        guard !nickname.isEmpty, !birthday.isEmpty, !city.isEmpty, !password.isEmpty, password == confirmPassword else { errorMessage = "请完整填写资料并确认密码"; return false }
-        isLoading = true; defer { isLoading = false }
-        do {
-            var avatarURL: String?
-            if let avatarData { avatarURL = try await APIClient.shared.uploadFile(data: avatarData, filename: "avatar.jpg", mimeType: "image/jpeg").data?.url }
-            let body = RegisterRequest(headPortrait: avatarURL, phone: phone, code: code, nickName: nickname, birthday: birthday, lat: latitude, lon: longitude, city: city, gender: gender, verificationCode: code, password: password, truePassword: confirmPassword, cityCode: cityCode)
-            let _: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "token/register", method: "POST", body: body, token: nil)
-            let login: APIEnvelope<LoginResponse> = try await APIClient.shared.request(path: "token/login", method: "POST", body: LoginRequest(username: phone, password: password), token: nil)
-            guard let token = login.data?.token, !token.isEmpty else { throw APIError(statusCode: nil, message: "注册成功但自动登录缺少 Token") }
-            TokenStore.shared.token = token; return true
-        } catch { errorMessage = error.localizedDescription; return false }
-    }
-}
 
 struct RegisterView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var model = RegisterViewModel()
-    @State private var showImagePicker = false; @State private var showHome = false
-
+    @State private var showImagePicker = false
+    @State private var showHome = false
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                if model.stage == 1 { stageOne } else { stageTwo }
-                if let error = model.errorMessage { Text(error).foregroundStyle(.red).font(.footnote).multilineTextAlignment(.center) }
-            }.padding(24)
-        }
-        .navigationTitle("注册").sheet(isPresented: $showImagePicker) { ImagePicker(data: $model.avatarData) }
-        .background(NavigationLink(destination: HomeView(), isActive: $showHome) { EmptyView() })
+        GeometryReader { proxy in
+            ZStack {
+                Color.white.ignoresSafeArea()
+                Image("FriendLoginLoginBackground").resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom).ignoresSafeArea()
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 16) {
+                        Color.clear.frame(height: 32)
+                        if model.stage == 1 { stageOne } else { stageTwo }
+                        if let error = model.errorMessage { Text(error).foregroundStyle(.red).font(.footnote).multilineTextAlignment(.center) }
+                        Button("已有账号？立即登录") { dismiss() }.foregroundStyle(Color(red:0.40,green:0.42,blue:0.60)).padding(.top, 25)
+                    }.padding(.horizontal, 38).padding(.bottom, proxy.safeAreaInsets.bottom + 30)
+                }
+            }
+        }.navigationBarHidden(true).background(NavigationLink(destination: HomeView(), isActive: $showHome) { EmptyView() }).sheet(isPresented: $showImagePicker) { ImagePicker(data: $model.avatarData) }
     }
-
-    private var stageOne: some View { VStack(spacing: 16) {
-        TextField("手机号", text: $model.phone).keyboardType(.phonePad).textFieldStyle(.roundedBorder)
-        TextField("验证码", text: $model.code).keyboardType(.numberPad).textFieldStyle(.roundedBorder)
-        Button("下一步") { Task { await model.verifyCode() } }.buttonStyle(.borderedProminent)
-    }}
-    private var stageTwo: some View { VStack(spacing: 16) {
-        Picker("性别", selection: $model.gender) { Text("男生").tag("male"); Text("女生").tag("female") }.pickerStyle(.segmented)
-        Button(model.avatarData == nil ? "选择头像" : "已选择头像") { showImagePicker = true }
-        TextField("昵称", text: $model.nickname).textFieldStyle(.roundedBorder)
-        TextField("生日（YYYY-MM-DD）", text: $model.birthday).textFieldStyle(.roundedBorder)
-        TextField("所在城市", text: $model.city).textFieldStyle(.roundedBorder)
-        SecureField("登录密码", text: $model.password).textFieldStyle(.roundedBorder)
-        SecureField("确认密码", text: $model.confirmPassword).textFieldStyle(.roundedBorder)
-        Button { Task { if await model.register() { showHome = true } } } label: { Text(model.isLoading ? "注册中…" : "完成注册").frame(maxWidth: .infinity).padding() }.buttonStyle(.borderedProminent).disabled(model.isLoading)
-    }}
-}
-
-struct ImagePicker: UIViewControllerRepresentable {
-    @Binding var data: Data?
-    func makeCoordinator() -> Coordinator { Coordinator(self) }
-    func makeUIViewController(context: Context) -> UIImagePickerController { let p = UIImagePickerController(); p.sourceType = .photoLibrary; p.delegate = context.coordinator; return p }
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-    final class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate { let parent: ImagePicker; init(_ parent: ImagePicker) { self.parent = parent }; func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) { if let image = info[.originalImage] as? UIImage { parent.data = image.jpegData(compressionQuality: 0.82) }; picker.dismiss(animated: true) } }
+    private var stageOne: some View { VStack(spacing: 16) { registerField("手机号", text: $model.phone, keyboard: .phonePad); registerField("验证码", text: $model.code, keyboard: .numberPad); Button("下一步") { Task { await model.verifyCode() } }.buttonStyle(.borderedProminent).tint(Color(red:0.31,green:0.33,blue:0.53)).frame(maxWidth:.infinity).padding(.top,20) } }
+    private var stageTwo: some View { VStack(spacing: 16) { HStack(spacing: 20) { gender("男生", "FriendLoginAvataman", "male"); gender("女生", "FriendLoginAvatarwoman", "female") }.padding(.bottom, 20); Button { showImagePicker = true } label: { ZStack { Circle().fill(Color.white); if model.avatarData == nil { Image("FriendLoginCamera").resizable().scaledToFit().frame(width:55,height:55); Image("FriendLoginAddCamera").resizable().frame(width:30,height:30).offset(y:38) } else { Image(uiImage: UIImage(data:model.avatarData!)!).resizable().scaledToFill() } }.frame(width:120,height:120).clipShape(Circle()) }; registerField("昵称", text: $model.nickname); registerField("生日", text: $model.birthday); registerField("所在城市", text: $model.city); secureField("登录密码", text: $model.password); secureField("确认密码", text: $model.confirmPassword); Button { Task { if await model.register() { showHome = true } } } label: { Text(model.isLoading ? "注册中…" : "完成注册").frame(maxWidth:.infinity).frame(height:44) }.buttonStyle(.borderedProminent).tint(Color(red:0.31,green:0.33,blue:0.53)).padding(.top,20) } }
+    private func registerField(_ label:String,text:Binding<String>,keyboard:UIKeyboardType = .default)->some View { HStack { Text(label).font(.system(size:15,weight:.bold)).foregroundStyle(Color(red:0.31,green:0.33,blue:0.53)).frame(width:70,alignment:.leading); TextField("请输入",text:text).keyboardType(keyboard) }.padding(.horizontal,18).frame(height:44).background(Color.white.opacity(0.92)).clipShape(Capsule()).overlay(Capsule().stroke(Color(red:0.31,green:0.33,blue:0.53),lineWidth:1)) }
+    private func secureField(_ label:String,text:Binding<String>)->some View { HStack { Text(label).font(.system(size:15,weight:.bold)).foregroundStyle(Color(red:0.31,green:0.33,blue:0.53)).frame(width:70,alignment:.leading); SecureField("请输入",text:text) }.padding(.horizontal,18).frame(height:44).background(Color.white.opacity(0.92)).clipShape(Capsule()).overlay(Capsule().stroke(Color(red:0.31,green:0.33,blue:0.53),lineWidth:1)) }
+    private func gender(_ title:String,_ image:String,_ value:String)->some View { Button { model.gender=value } label: { VStack { Image(image).resizable().scaledToFit().frame(height:55); Text(title).foregroundStyle(.black) }.frame(width:130,height:115).background(model.gender==value ? Color.white : Color.white.opacity(0.65)).clipShape(RoundedRectangle(cornerRadius:18)).overlay(RoundedRectangle(cornerRadius:18).stroke(model.gender==value ? Color(red:0.31,green:0.33,blue:0.53):.clear,lineWidth:2)) } }
 }
