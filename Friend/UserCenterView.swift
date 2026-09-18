@@ -14,7 +14,7 @@ struct UserCenterView: View {
                 Color.black.opacity(0.1).ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        Color.clear.frame(height: proxy.safeAreaInsets.top + px(28, w))
+                        Color.clear.frame(height: proxy.safeAreaInsets.top)
                         topBar(width: w)
                         if let info = model.userInfo {
                             profile(info, width: w)
