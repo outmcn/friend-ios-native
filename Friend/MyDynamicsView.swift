@@ -17,13 +17,20 @@ struct MyDynamicsView: View {
     }
 }
 
+@MainActor final class MyDynamicsViewModel: ObservableObject {
+    @Published var items: [BlogPageResponse] = []
+    func load() async { do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: MyDynamicsPageQuery(pageIndex: 1, pageSize: 20)); items = r.data?.rows ?? [] } catch { items = [] } }
+    func toggleLike(_ item: BlogPageResponse) async { _ = try? await APIClient.shared.request(path: "community/frblog/like/\(item.id)", method: "POST", body: EmptyBody()) as APIEnvelope<EmptyResponse>; await load() }
+    func delete(_ item: BlogPageResponse) async { _ = try? await APIClient.shared.request(path: "community/frblog/\(item.id)", method: "DELETE", body: EmptyBody()); await load() }
+}
+struct MyDynamicsPageQuery: Encodable { let pageIndex: Int; let pageSize: Int }
+
 struct CommentsView: View {
     let blogId: Int
     @StateObject private var model = CommentsViewModel()
     @State private var content = ""
     var body: some View { VStack { List(model.items) { c in VStack(alignment: .leading) { Text(c.nickName ?? "用户").font(.headline); Text(c.content ?? ""); Text(c.pushTime ?? "").font(.caption).foregroundStyle(.secondary) } }; HStack { TextField("写评论", text: $content).textFieldStyle(.roundedBorder); Button("发送") { Task { await model.submit(blogId: blogId, content: content); content = "" } } }.padding() }.navigationTitle("评论").navigationBarTitleDisplayMode(.inline).task { await model.load(blogId: blogId) } }
 }
-
 struct CommentItem: Decodable, Identifiable { let id: Int; let userId: Int?; let content: String?; let nickName: String?; let pushTime: String? }
 @MainActor final class CommentsViewModel: ObservableObject {
     @Published var items: [CommentItem] = []
