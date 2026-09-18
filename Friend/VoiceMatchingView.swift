@@ -12,14 +12,6 @@ struct VoiceMatchingView: View {
             ZStack {
                 Color(red: 0.01, green: 0.04, blue: 0.07).ignoresSafeArea()
                 VStack(spacing: 0) {
-                    Color.clear.frame(height: proxy.safeAreaInsets.top)
-                    HStack {
-                        Button { dismiss() } label: { Image("FriendWhiteBack").resizable().scaledToFit().frame(width: px(44,w), height: px(44,w)) }
-                        Spacer()
-                        Text("语音匹配").font(.system(size: px(36,w), weight: .medium)).foregroundStyle(Color(red:0.87,green:0.89,blue:0.98))
-                        Spacer()
-                        Color.clear.frame(width: px(44,w), height: px(44,w))
-                    }.padding(.horizontal, px(32,w))
                     Spacer()
                     ZStack {
                         Image("FriendVideoMatchingRing").resizable().scaledToFit().frame(width: w, height: px(758,w)).opacity(0.72)
@@ -36,7 +28,17 @@ struct VoiceMatchingView: View {
                     Spacer(minLength: proxy.safeAreaInsets.bottom + 24)
                 }
             }
-        }.navigationBarHidden(true).task { await model.load() }.onDisappear { Task { await model.stop() } }
+        }
+        .navigationTitle("语音匹配")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button { dismiss() } label: { Image(systemName: "chevron.left") }
+                    .accessibilityLabel("返回")
+            }
+        }
+        .task { await model.load() }
+        .onDisappear { Task { await model.stop() } }
     }
 
     private func voiceButton(title: String, type: String, width: CGFloat) -> some View {
