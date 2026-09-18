@@ -13,6 +13,7 @@ struct NativeHomeView: View {
                     topBar.padding(.top, proxy.safeAreaInsets.top)
                     Spacer(minLength: 0)
                     mainActions
+                        .offset(y: -72)
                     Spacer(minLength: 0)
                     bottomBar(proxy: proxy)
                 }
@@ -56,7 +57,8 @@ struct NativeHomeView: View {
             Image("tabbarBackground").resizable().scaledToFit().frame(maxWidth: .infinity).padding(.horizontal, 0)
             HStack(spacing: 0) { tabItem(0, "tabbar1White", "tabbar1Black", "星空"); tabItem(1, "tabbar2White", "tabbar2Black", "发现"); tabItem(2, "tabbar3White", "tabbar3Black", "消息"); tabItem(3, "tabbar4White", "tabbar4Black", "我的") }.padding(.horizontal, 40)
         }
-        .frame(height: 94).padding(.bottom, proxy.safeAreaInsets.bottom)
+        .frame(height: 94)
+        .padding(.bottom, proxy.safeAreaInsets.bottom)
     }
 
     private func tabItem(_ index: Int, _ white: String, _ black: String, _ title: String) -> some View {
