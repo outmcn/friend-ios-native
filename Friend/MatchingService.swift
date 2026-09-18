@@ -59,10 +59,10 @@ final class MatchingService: NSObject, URLSessionWebSocketDelegate {
         }
     }
 
-    func stop() async {
+    func stop() {
         heartbeat?.cancel(); heartbeat = nil
         socket?.cancel(with: .goingAway, reason: nil); socket = nil
-        _ = try? await APIClient.shared.request(path: "community/fruser/end/matching", method: "GET", body: EmptyBody()) as APIEnvelope<EmptyResponse>
+        Task { _ = try? await APIClient.shared.request(path: "community/fruser/end/matching", method: "GET", body: EmptyBody()) as APIEnvelope<EmptyResponse> }
     }
 
     private func sendText(_ text: String) async throws {

@@ -46,5 +46,5 @@ struct VideoMatchingView: View {
     private let service = MatchingService()
     func load() async { avatarURL = nil }
     func start(type: String) async { let id = 0; isMatching = true; errorMessage = nil; do { try await service.start(type: type, userId: id); let match = try await service.receive(); avatarURL = match.headPortrait } catch { errorMessage = error.localizedDescription; isMatching = false } }
-    func stop() async { await service.stop(); isMatching = false }
+    func stop() async { service.stop(); isMatching = false }
 }
