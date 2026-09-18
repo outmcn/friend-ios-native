@@ -28,7 +28,7 @@ struct VideoMatchingView: View {
                     Spacer()
                 }
             }
-        }.navigationBarHidden(true).task { await model.load() }
+        }.navigationBarHidden(true).task { await model.load() }.onDisappear { Task { await model.stop() } }
     }
 
     private func matchButton(title: String, type: String, icon: Bool, width: CGFloat) -> some View {
@@ -48,5 +48,7 @@ struct VideoMatchingView: View {
         do { try await service.start(type: type, userId: id); let match = try await service.receive(); avatarURL = match.headPortrait }
         catch { errorMessage = error.localizedDescription; isMatching = false }
     }
-    deinit { Task { await service.stop() } }
+    func stop() async {
+        await service.stop()
+    }
 }
