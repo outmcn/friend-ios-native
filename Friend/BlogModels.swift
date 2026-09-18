@@ -1,6 +1,6 @@
 import Foundation
 
-struct BlogPageResponse: Decodable, Identifiable {
+struct BlogPageResponse: Codable, Identifiable {
     let id: Int
     let userId: Int?
     let content: String?
