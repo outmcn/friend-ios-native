@@ -5,9 +5,6 @@ struct NativeHomeView: View {
     @State private var musicOn = true
     @State private var selectedTab = 0
     @State private var showMatching = false
-    @State private var showDiscovery = false
-    @State private var showMessages = false
-    @State private var showProfile = false
     private let designWidth: CGFloat = 750
     private func px(_ rpx: CGFloat, _ width: CGFloat) -> CGFloat { width * rpx / designWidth }
 
@@ -16,25 +13,29 @@ struct NativeHomeView: View {
             let w = proxy.size.width, h = proxy.size.height
             ZStack(alignment: .topLeading) {
                 FriendHomeBackground()
-                sourceHeader(width: w, top: proxy.safeAreaInsets.top)
-                sourceFunctionButtons(width: w, height: h)
-                sourceTabBar(width: w, height: h)
+                tabContent(width: w, height: h, top: proxy.safeAreaInsets.top)
             }.ignoresSafeArea()
         }
-        .background(
-            NavigationLink(destination: Text("视频匹配"), isActive: $showMatching) { EmptyView() }
-        )
-        .background(
-            NavigationLink(destination: DiscoveryView(), isActive: $showDiscovery) { EmptyView() }
-        )
-        .background(
-            NavigationLink(destination: Text("消息"), isActive: $showMessages) { EmptyView() }
-        )
-        .background(
-            NavigationLink(destination: UserCenterView(), isActive: $showProfile) { EmptyView() }
-        )
+        .background(NavigationLink(destination: Text("视频匹配"), isActive: $showMatching) { EmptyView() })
         .task { await model.load() }
         .refreshable { await model.load() }
+    }
+
+    @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
+        switch selectedTab {
+        case 1: DiscoveryView()
+        case 2: Text("消息").foregroundStyle(.white).font(.title)
+        case 3: UserCenterView()
+        default: homeContent(width: width, height: height, top: top)
+        }
+    }
+
+    private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
+        ZStack(alignment: .topLeading) {
+            sourceHeader(width: width, top: top)
+            sourceFunctionButtons(width: width, height: height)
+            sourceTabBar(width: width, height: height)
+        }
     }
 
     private func sourceHeader(width: CGFloat, top: CGFloat) -> some View {
@@ -47,8 +48,8 @@ struct NativeHomeView: View {
                 }
                 Spacer()
                 HStack(spacing: px(20, width)) {
-                    Button { musicOn.toggle() } label: { Image(musicOn ? "FriendMusicWhite" : "FriendMusicBlack").resizable().scaledToFit().frame(width: px(54, width), height: px(54, width)) }.contentShape(Rectangle())
-                    Button { } label: { HStack(spacing: px(8, width)) { Image("FriendScreen").resizable().scaledToFit().frame(width: px(20, width), height: px(20, width)); Text("筛选").font(.system(size: px(24, width))) }.foregroundStyle(.white).frame(width: px(120, width), height: px(54, width)).background(Image("FriendScreenBackground").resizable().scaledToFill()).clipShape(Capsule()).overlay(Capsule().stroke(.white, lineWidth: px(2, width))) }.contentShape(Rectangle())
+                    Button { musicOn.toggle() } label: { Image(musicOn ? "FriendMusicWhite" : "FriendMusicBlack").resizable().scaledToFit().frame(width: px(54, width), height: px(54, width)) }
+                    Button { } label: { HStack(spacing: px(8, width)) { Image("FriendScreen").resizable().scaledToFit().frame(width: px(20, width), height: px(20, width)); Text("筛选").font(.system(size: px(24, width))) }.foregroundStyle(.white).frame(width: px(120, width), height: px(54, width)).background(Image("FriendScreenBackground").resizable().scaledToFill()).clipShape(Capsule()).overlay(Capsule().stroke(.white, lineWidth: px(2, width))) }
                 }
             }.padding(.horizontal, px(56, width))
         }
@@ -57,8 +58,8 @@ struct NativeHomeView: View {
     private func sourceFunctionButtons(width: CGFloat, height: CGFloat) -> some View {
         let icon = px(128, width), groupHeight = icon + px(28, width) + px(45, width)
         return HStack(spacing: 0) {
-            Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2).contentShape(Rectangle())
-            Button { } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2).contentShape(Rectangle())
+            Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2)
+            Button { } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2)
         }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
     }
     private func sourceFunction(image: String, title: String, width: CGFloat, icon: CGFloat) -> some View {
@@ -73,11 +74,6 @@ struct NativeHomeView: View {
         }.frame(width: width,height: barHeight).position(x: width/2,y: height-bottom-barHeight/2)
     }
     private func sourceTab(_ i:Int,_ selected:String,_ normal:String,_ title:String,_ width:CGFloat)->some View {
-        Button {
-            selectedTab = i
-            if i == 1 { showDiscovery = true }
-            if i == 2 { showMessages = true }
-            if i == 3 { showProfile = true }
-        } label: { VStack(spacing:0) { Image(selectedTab==i ? selected:normal).resizable().scaledToFit().frame(width:px(44,width),height:px(44,width)); Text(title).font(.system(size:px(18,width),weight:.bold)).foregroundStyle(Color(red:0.82,green:0.87,blue:0.92)) }.frame(maxWidth:.infinity,maxHeight:.infinity) }.contentShape(Rectangle())
+        Button { selectedTab = i } label: { VStack(spacing:0) { Image(selectedTab==i ? selected:normal).resizable().scaledToFit().frame(width:px(44,width),height:px(44,width)); Text(title).font(.system(size:px(18,width),weight:.bold)).foregroundStyle(Color(red:0.82,green:0.87,blue:0.92)) }.frame(maxWidth:.infinity,maxHeight:.infinity) }
     }
 }
