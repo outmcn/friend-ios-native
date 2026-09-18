@@ -78,7 +78,12 @@ struct UserCenterView: View {
             HStack { RemoteAvatar(urlString: blog.headPortrait, size: 42); VStack(alignment: .leading) { Text(blog.nickName ?? model.userInfo?.nickName ?? "用户").font(.headline); Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.white.opacity(0.6)) }; Spacer() }
             if let content = blog.content, !content.isEmpty { Text(content).font(.system(size: 16)).foregroundStyle(.white) }
             if let images = blog.images { ForEach(images, id: \.self) { image in RemoteAvatar(urlString: image, size: px(180, w)) } }
-            HStack { Label("\(blog.fabulous ?? 0)", systemImage: "heart"); Label("\(blog.comment ?? 0)", systemImage: "message") }.font(.footnote).foregroundStyle(.white.opacity(0.65))
+            HStack {
+                Button { Task { await dynamics.toggleLike(blog) } } label: { Label("\(blog.fabulous ?? 0)", systemImage: blog.thumbsUp == true ? "heart.fill" : "heart") }
+                NavigationLink { CommentsView(blogId: blog.id) } label: { Label("\(blog.comment ?? 0)", systemImage: "message") }
+                Spacer()
+                if blog.userId == model.userInfo?.id { Menu { Button("删除动态", role: .destructive) { Task { await dynamics.delete(blog) } } } label: { Image(systemName: "ellipsis") } }
+            }.font(.footnote).foregroundStyle(.white.opacity(0.75))
         }.padding(14).frame(maxWidth: .infinity, alignment: .leading).background(Color.white.opacity(0.12)).clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -86,6 +91,8 @@ struct UserCenterView: View {
 @MainActor final class UserCenterDynamicsViewModel: ObservableObject {
     @Published var items: [BlogPageResponse] = []
     func load() async { do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: UserCenterPageQuery(pageIndex: 1, pageSize: 100)); items = r.data?.rows ?? [] } catch { items = [] } }
+    func toggleLike(_ item: BlogPageResponse) async { let _: APIEnvelope<EmptyResponse>? = try? await APIClient.shared.request(path: "community/frblog/like/\(item.id)", method: "POST", body: EmptyBody()); await load() }
+    func delete(_ item: BlogPageResponse) async { let _: APIEnvelope<EmptyResponse>? = try? await APIClient.shared.request(path: "community/frblog/\(item.id)", method: "DELETE", body: EmptyBody()); await load() }
 }
 
 struct UserCenterPageQuery: Encodable { let pageIndex: Int; let pageSize: Int }
