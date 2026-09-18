@@ -39,14 +39,14 @@ struct UserCenterView: View {
 
     private func topBar(width w: CGFloat) -> some View {
         HStack {
-            Button("编辑") { }
-                .font(.system(size: px(28, w), weight: .medium))
+            Button { } label: { Image(systemName: "pencil") }
+                .font(.system(size: px(32, w), weight: .medium))
                 .foregroundStyle(.white)
             Spacer()
             HStack(spacing: px(28, w)) {
                 Button { } label: { Image(systemName: "person.crop.circle.badge.clock") }
                 Button { } label: { Image(systemName: "person.badge.plus") }
-                NavigationLink { UserSettingsView() } label: { Image(systemName: "gearshape") }
+                NavigationLink { UserSettingsView() } label: { Image(systemName: "line.3.horizontal") }
             }
             .font(.system(size: px(32, w), weight: .medium))
             .foregroundStyle(.white)
