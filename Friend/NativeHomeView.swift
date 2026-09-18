@@ -84,7 +84,7 @@ struct NativeHomeView: View {
 
     private func sourceTabBar(width: CGFloat, height: CGFloat, bottomInset: CGFloat) -> some View {
         let barHeight = px(132, width)
-        let bottom = max(0, bottomInset - px(6, width))
+        let bottom: CGFloat = 0
         return ZStack {
             Image("tabbarBackground").resizable().scaledToFit().frame(width: width, height: barHeight)
             HStack(spacing: 0) { sourceTab(0,"tabbar1White","tabbar1Black","星空",width); sourceTab(1,"tabbar2White","tabbar2Black","发现",width); sourceTab(2,"tabbar3White","tabbar3Black","消息",width); sourceTab(3,"tabbar4White","tabbar4Black","我的",width) }.padding(.horizontal, px(40,width)).frame(width: width,height: barHeight)
