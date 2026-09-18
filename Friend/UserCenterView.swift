@@ -30,7 +30,7 @@ struct UserCenterView: View {
     @Published var likeError: String?
     private let cacheKey = "friend.user.dynamics.cache"
     init() { if let data = UserDefaults.standard.data(forKey: cacheKey), let cached = try? JSONDecoder().decode([BlogPageResponse].self, from: data) { items = cached } }
-    func loadIfNeeded() async { guard items.isEmpty else { return }; await load() }
+    func loadIfNeeded() async { guard items.isEmpty else { return }; do { try await load() } catch { errorMessage = error.localizedDescription } }
     func load() async throws { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: UserCenterPageQuery(pageIndex: 1, pageSize: 100)); guard let rows = r.data?.rows else { throw APIError(statusCode: nil, message: r.msg ?? "动态数据为空") }; items = rows; UserDefaults.standard.removeObject(forKey: cacheKey); if let data = try? JSONEncoder().encode(rows) { UserDefaults.standard.set(data, forKey: cacheKey) }; errorMessage = nil }
     func toggleLike(_ item: BlogPageResponse) async throws { let r: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "community/frblog/like/\(item.id)", method: "POST", body: EmptyBody()); guard r.code == 200 else { throw APIError(statusCode: r.code, message: r.msg ?? "点赞失败") }; try await load() }
 }
