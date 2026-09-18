@@ -23,14 +23,6 @@ struct FollowFansView: View {
         .background(Color(.systemBackground).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button { dismiss() } label: {
-                    Image(systemName: "chevron.left")
-                }
-                .accessibilityLabel("返回")
-            }
-        }
         .onChange(of: tab) { _ in Task { await model.load(tab: tab) } }
         .task { await model.load(tab: tab) }
     }

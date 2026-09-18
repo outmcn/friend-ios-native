@@ -31,12 +31,6 @@ struct VoiceMatchingView: View {
         }
         .navigationTitle("语音匹配")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button { dismiss() } label: { Image(systemName: "chevron.left") }
-                    .accessibilityLabel("返回")
-            }
-        }
         .task { await model.load() }
         .onDisappear { Task { await model.stop() } }
     }
