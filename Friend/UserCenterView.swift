@@ -41,12 +41,12 @@ struct UserCenterView: View {
         HStack {
             HStack(spacing: 0) {
                 Button { } label: { ProfileActionIcon(kind: .pencil) }
-                    .frame(width: px(59, w), height: px(60, w))
+                    .frame(width: px(38, w), height: px(38, w))
                 Spacer()
                 HStack(spacing: px(40, w)) {
-                    Button { } label: { ProfileActionIcon(kind: .footprints) }
-                    Button { } label: { ProfileActionIcon(kind: .addPerson) }
-                    NavigationLink { UserSettingsView() } label: { ProfileActionIcon(kind: .menu) }
+                    Button { } label: { ProfileActionIcon(kind: .footprints).frame(width: px(38, w), height: px(38, w)) }
+                    Button { } label: { ProfileActionIcon(kind: .addPerson).frame(width: px(38, w), height: px(38, w)) }
+                    NavigationLink { UserSettingsView() } label: { ProfileActionIcon(kind: .menu).frame(width: px(38, w), height: px(38, w)) }
                 }
                 .frame(height: px(60, w))
             }
