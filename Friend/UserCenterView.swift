@@ -14,7 +14,7 @@ struct UserCenterView: View {
             ZStack { Image("FriendUserIndex").resizable().scaledToFill().ignoresSafeArea(); Color.black.opacity(0.1).ignoresSafeArea(); ScrollView(showsIndicators: false) { VStack(spacing: 0) { Color.clear.frame(height: (topSafeArea ?? proxy.safeAreaInsets.top) + px(24, w)); topBar(width: w); if let info = model.userInfo { profile(info, width: w); dynamicList(width: w) } else { Button("请登录") { showLogin = true }.foregroundStyle(.white).padding(.top, 100) }; Color.clear.frame(height: 120) }.padding(.horizontal, px(32, w)) }.refreshable { await refreshAll() } }
         }.navigationTitle("").navigationBarHidden(true).sheet(isPresented: $showLogin) { NavigationView { LoginView() } }.task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }.onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
     }
-    private func loadAll() async { await model.loadIfNeeded(); await dynamics.load() }
+    private func loadAll() async { await model.loadIfNeeded(); await dynamics.loadIfNeeded() }
     private func refreshAll() async { await model.refresh(); await dynamics.load() }
     private func topBar(width w: CGFloat) -> some View { HStack { HStack(spacing: 0) { Button { } label: { ProfileActionIcon(kind: .pencil) }.frame(width: px(38, w), height: px(38, w)); Spacer(); HStack(spacing: px(40, w)) { Button { } label: { ProfileActionIcon(kind: .footprints).frame(width: px(38, w), height: px(38, w)) }; Button { } label: { ProfileActionIcon(kind: .addPerson).frame(width: px(38, w), height: px(38, w)) }; NavigationLink { UserSettingsView() } label: { ProfileActionIcon(kind: .menu).frame(width: px(38, w), height: px(38, w)) } }.frame(height: px(60, w)) }.font(.system(size: px(32, w), weight: .medium)).foregroundStyle(Color(white: 0.96)).frame(height: px(60, w)) }.frame(height: px(52, w)) }
     private func profile(_ info: PersonalCenter, width w: CGFloat) -> some View { HStack(spacing: px(24, w)) { VStack(alignment: .leading, spacing: px(18, w)) { HStack(spacing: px(18, w)) { Text(info.nickName ?? "用户").font(.system(size: px(40, w), weight: .bold)).foregroundStyle(.white); Text(info.genderText).font(.system(size: px(25, w))).foregroundStyle(.pink); Text("IP：\(info.city ?? cachedCity ?? "未知")").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65)) }; HStack(spacing: px(32, w)) { statValue("\(info.followCount ?? 0)", "关注", w); statValue("\(info.fansCount ?? 0)", "粉丝", w); statValue("\(info.likeCount ?? 0)", "赞", w) } }; Spacer(minLength: 0); RemoteAvatar(urlString: info.headPortrait, size: px(140, w)) }.padding(.top, px(34, w)) }
@@ -26,8 +26,11 @@ struct UserCenterView: View {
 @MainActor final class UserCenterDynamicsViewModel: ObservableObject {
     @Published var items: [BlogPageResponse] = []
     @Published var errorMessage: String?
+    private let cacheKey = "friend.user.dynamics.cache"
+    init() { if let data = UserDefaults.standard.data(forKey: cacheKey), let cached = try? JSONDecoder().decode([BlogPageResponse].self, from: data) { items = cached } }
+    func loadIfNeeded() async { guard items.isEmpty else { return }; await load() }
     func load() async {
-        do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: UserCenterPageQuery(pageIndex: 1, pageSize: 100)); guard let rows = r.data?.rows else { throw APIError(statusCode: nil, message: r.msg ?? "动态数据为空") }; items = rows; errorMessage = nil }
+        do { let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: "community/frblog/mine/blog/page", method: "GET", body: UserCenterPageQuery(pageIndex: 1, pageSize: 100)); guard let rows = r.data?.rows else { throw APIError(statusCode: nil, message: r.msg ?? "动态数据为空") }; items = rows; if let data = try? JSONEncoder().encode(rows) { UserDefaults.standard.set(data, forKey: cacheKey) }; errorMessage = nil }
         catch { errorMessage = error.localizedDescription }
     }
     func toggleLike(_ item: BlogPageResponse) async { let _: APIEnvelope<EmptyResponse>? = try? await APIClient.shared.request(path: "community/frblog/like/\(item.id)", method: "POST", body: EmptyBody()); await load() }
