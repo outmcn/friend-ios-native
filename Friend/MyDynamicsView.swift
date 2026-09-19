@@ -12,6 +12,7 @@ struct MyDynamicsView: View {
 
 struct DynamicDetailView: View {
     let blog: BlogPageResponse
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var model = DynamicDetailViewModel()
     @FocusState private var inputFocused: Bool
     @State private var actionError: String?
@@ -19,7 +20,7 @@ struct DynamicDetailView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    HStack { RemoteAvatar(urlString:blog.headPortrait,size:48); VStack(alignment:.leading){Text(blog.nickName ?? "用户").font(.headline);Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.secondary)}; Spacer(); Menu { Button("删除动态",role:.destructive){Task{do{try await model.delete(blog)}catch{actionError=error.localizedDescription}}} } label:{Image(systemName:"ellipsis")} }
+                    HStack { RemoteAvatar(urlString:blog.headPortrait,size:48); VStack(alignment:.leading){Text(blog.nickName ?? "用户").font(.headline);Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.secondary)}; Spacer(); Menu { Button("删除动态",role:.destructive){Task{do{try await model.delete(blog); UserDefaults.standard.removeObject(forKey:"friend.user.dynamics.cache"); dismiss()}catch{actionError=error.localizedDescription}}} } label:{Image(systemName:"ellipsis")} }
                     if let c=blog.content,!c.isEmpty { Text(c) }
                     if let imgs=blog.images,!imgs.isEmpty { ForEach(imgs,id:\.self){ image in DynamicImageView(urlString:image) } }
                     HStack { Button { Task { do { try await model.toggleLike(blog) } catch { actionError = error.localizedDescription } } } label:{Label("\(model.likeCount)",systemImage:model.liked ? "heart.fill":"heart")}; Spacer() }.foregroundStyle(model.liked ? .red:.secondary)
