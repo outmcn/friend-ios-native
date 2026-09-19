@@ -22,9 +22,19 @@ struct UserCenterView: View {
                     topBar(width: w)
                     if let info = model.userInfo {
                         ScrollView(showsIndicators: false) {
-                            VStack(spacing: 0) {
+                            LazyVStack(spacing: 12, pinnedViews: [.sectionHeaders]) {
                                 profile(info, width: w)
-                                dynamicList(width: w)
+                                Section {
+                                    if dynamics.items.isEmpty {
+                                        if let error = dynamics.errorMessage { Text(error).font(.system(size: px(24, w))).foregroundStyle(.red) }
+                                        else { Text("暂无动态").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.6)) }
+                                    } else {
+                                        ForEach(dynamics.items) { blog in blogCard(blog, w) }
+                                    }
+                                } header: {
+                                    dynamicsCategories(width: w)
+                                        .padding(.top, px(12, w))
+                                }
                             }
                             .padding(.horizontal, px(32, w))
                             .padding(.bottom, 120)
