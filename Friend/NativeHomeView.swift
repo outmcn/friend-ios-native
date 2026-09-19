@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct NativeHomeView: View {
-    @StateObject private var model = DiscoveryViewModel()
     @StateObject private var music = BackgroundMusicPlayer.shared
     @State private var selectedTab = 0
     @State private var showMatching = false
@@ -20,8 +19,6 @@ struct NativeHomeView: View {
         }
         .ignoresSafeArea()
         .background(NavigationLink(destination: VoiceMatchingView(), isActive: $showMatching) { EmptyView() })
-        .task { await model.load() }
-        .refreshable { await model.load() }
     }
 
     @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
@@ -42,23 +39,7 @@ struct NativeHomeView: View {
     }
 
     private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) { sourceHeader(width: width, top: top); starUserRecommendations(width: width, top: top); sourceFunctionButtons(width: width, height: height); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
-    }
-
-    private func starUserRecommendations(width: CGFloat, top: CGFloat) -> some View {
-        let avatarSize = px(104, width)
-        return VStack(alignment: .leading, spacing: px(34, width)) {
-            Text("视频聊，更靠谱").font(.system(size: px(36, width), weight: .regular)).foregroundStyle(Color(red:0.87,green:0.89,blue:0.98))
-            HStack(alignment: .top, spacing: 0) {
-                recommendation(user: model.users.indices.contains(0) ? model.users[0] : nil, caption: "送给你的小姐姐", width: width, size: avatarSize)
-                recommendation(user: model.users.indices.contains(1) ? model.users[1] : nil, caption: "For you", width: width, size: avatarSize)
-                recommendation(user: model.users.indices.contains(2) ? model.users[2] : nil, caption: "For you", width: width, size: avatarSize)
-            }
-        }.padding(.horizontal, px(56, width)).padding(.top, top + px(145, width)).frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func recommendation(user: DiscoveryUser?, caption: String, width: CGFloat, size: CGFloat) -> some View {
-        VStack(spacing: px(8, width)) { if let user { RemoteAvatar(urlString: user.headPortrait, size: size) } else { Circle().fill(Color.white.opacity(0.18)).frame(width: size, height: size).overlay(Image(systemName: "person.fill").foregroundStyle(.white.opacity(0.7))) }; Text(caption).font(.system(size: px(30, width), weight: .bold)).foregroundStyle(.white).lineLimit(1) }.frame(maxWidth: .infinity)
+        ZStack(alignment: .topLeading) { sourceHeader(width: width, top: top); sourceFunctionButtons(width: width, height: height); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
     }
 
     private func sourceHeader(width: CGFloat, top: CGFloat) -> some View {
