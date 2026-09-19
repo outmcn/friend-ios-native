@@ -6,7 +6,8 @@ import SwiftUI
     @Published var posts: [DiscoveryPost] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
-    func load() async { isLoading = true; defer { isLoading = false }; do { let path = selectedTab == 0 ? "community/frblog/near/blog/page" : selectedTab == 1 ? "community/frblog/near/blog/page" : "community/frblog/follow/blog/page"; let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: path, method: "GET", body: DiscoveryQuery(pageIndex: 1, pageSize: 50)); guard r.code == 200, let rows = r.data?.rows else { throw APIError(statusCode: r.code, message: r.msg ?? "动态加载失败") }; posts = rows.map { DiscoveryPost($0) }; errorMessage = nil } catch is CancellationError { } catch { errorMessage = error.localizedDescription } }
+    func load() async { isLoading = true; errorMessage = nil; defer { isLoading = false }; do { let path = selectedTab == 0 ? "community/frblog/near/blog/page" : selectedTab == 1 ? "community/frblog/near/blog/page" : "community/frblog/follow/blog/page"; let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: path, method: "GET", body: DiscoveryQuery(pageIndex: 1, pageSize: 50)); guard r.code == 200, let rows = r.data?.rows else { throw APIError(statusCode: r.code, message: r.msg ?? "动态加载失败") }; posts = rows.map { DiscoveryPost($0) }; errorMessage = nil } catch { if Self.isCancellation(error) { errorMessage = nil; return }; errorMessage = error.localizedDescription } }
+    private static func isCancellation(_ error: Error) -> Bool { if error is CancellationError { return true }; if let urlError = error as? URLError, urlError.code == .cancelled { return true }; let nsError = error as NSError; return nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled || error.localizedDescription.lowercased().contains("cancel") }
 }
 struct DiscoveryQuery: Encodable { let pageIndex: Int; let pageSize: Int }
 struct DiscoveryPost: Identifiable { let id: Int; let userId: Int?; let name: String; let text: String; let imageURL: String?; let likes: Int; let comments: Int; let favorites: Int; let pushTime: String?; let following: Bool?; let headPortrait: String?; init(_ blog: BlogPageResponse) { id=blog.id; userId=blog.userId; name=blog.nickName ?? "用户"; text=blog.content ?? ""; imageURL=blog.images?.first; likes=blog.fabulous ?? 0; comments=blog.comment ?? 0; favorites=blog.favorite ?? 0; pushTime=blog.pushTime; following=blog.following; headPortrait=blog.headPortrait } }
@@ -21,7 +22,7 @@ struct DiscoveryView: View {
                     Color.clear.frame(height: max(proxy.safeAreaInsets.top, 44))
                     header
                     ScrollView(showsIndicators: false) {
-                        if let error = model.errorMessage { Text(error).foregroundStyle(.red).padding() }
+                        if let error = model.errorMessage, !error.isEmpty, error.lowercased().contains("cancel") == false { Text(error).foregroundStyle(.red).padding() }
                         LazyVStack(spacing: 14) {
                             ForEach(model.posts) { post in
                                 NavigationLink(destination: detail(for: post)) { postCard(post) }.buttonStyle(.plain)
