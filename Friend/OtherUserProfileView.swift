@@ -16,7 +16,7 @@ struct OtherUserProfileView: View {
                     Spacer()
                     Button(model.followTitle) { Task { await model.toggleFollow() } }.buttonStyle(.borderedProminent)
                 }.padding()
-                HStack { stat("\(model.info?.blogCount ?? Int64(model.posts.count))", "动态"); Spacer(); stat("\(model.info?.followCount ?? 0)", "关注"); Spacer(); stat("\(model.info?.fansCount ?? 0)", "粉丝") }.padding(.horizontal)
+                HStack { stat("\(model.info?.blogCount ?? Int64(model.posts.count))", "动态"); Spacer(); stat("\(model.info?.followCount ?? 0)", "关注"); Spacer(); stat("\(model.info?.fansCount ?? 0)", "粉丝"); Spacer(); stat("\(model.info?.onlineDays ?? 0)", "天") }.padding(.horizontal)
                 if let message = model.message { Text(message).foregroundStyle(.red).padding() }
                 ForEach(model.posts) { post in NavigationLink { DynamicDetailView(blog: post) } label: { VStack(alignment: .leading, spacing: 8) { Text(post.content ?? "").foregroundStyle(.white); Text(post.pushTime ?? "").font(.caption).foregroundStyle(.white.opacity(0.55)); HStack { Label("\(post.fabulous ?? 0)", systemImage: "heart"); Label("\(post.comment ?? 0)", systemImage: "message") }.font(.caption).foregroundStyle(.white.opacity(0.7)) }.padding(14).frame(maxWidth: .infinity, alignment: .leading).background(Color.white.opacity(0.1)).clipShape(RoundedRectangle(cornerRadius: 14)) }.buttonStyle(.plain) }.padding(.horizontal)
             }
@@ -51,4 +51,4 @@ struct OtherUserProfileView: View {
         do { let response: APIEnvelope<String> = try await APIClient.shared.request(path: path, method: "GET", body: EmptyBody()); guard response.code == 200 else { throw APIError(statusCode: response.code, message: response.msg ?? "关注失败") }; await load() } catch { message = error.localizedDescription }
     }
 }
-struct OtherUserInfo: Decodable { let id: Int?; let headPortrait: String?; let nickName: String?; let city: String?; let followStatus: String?; let blogCount: Int64?; let followCount: Int64?; let fansCount: Int64? }
+struct OtherUserInfo: Decodable { let id: Int?; let headPortrait: String?; let nickName: String?; let city: String?; let followStatus: String?; let blogCount: Int64?; let followCount: Int64?; let fansCount: Int64?; let onlineDays: Int64? }
