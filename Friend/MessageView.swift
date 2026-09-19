@@ -3,6 +3,7 @@ import SwiftUI
 struct MessageView: View {
     @State private var search = ""
     @State private var messages = MessageItem.placeholders
+    @State private var selectedGroup = 0
     var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -17,10 +18,10 @@ struct MessageView: View {
             }
         }.navigationBarHidden(true)
     }
-    private var filtered: [MessageItem] { search.isEmpty ? messages : messages.filter { $0.name.localizedCaseInsensitiveContains(search) || $0.preview.localizedCaseInsensitiveContains(search) } }
+    private var filtered: [MessageItem] { let source = selectedGroup == 0 ? messages.filter { $0.name != "好友消息" } : messages.filter { $0.name == "好友消息" }; return search.isEmpty ? source : source.filter { $0.name.localizedCaseInsensitiveContains(search) || $0.preview.localizedCaseInsensitiveContains(search) } }
     private var header: some View {
         VStack(spacing: 12) {
-            HStack { Text("消息").font(.system(size: 28, weight: .bold)).foregroundStyle(.white); Spacer(); Button { } label: { Image(systemName: "square.and.pencil").font(.system(size: 21)).foregroundStyle(.white) } }.padding(.horizontal, 20)
+            HStack(spacing: 0) { ForEach(["消息", "好友"].indices, id: \.self) { i in Button { selectedGroup = i } label: { Text(["消息", "好友"][i]).font(.system(size: i == selectedGroup ? 18 : 16, weight: i == selectedGroup ? .bold : .regular)).foregroundStyle(i == selectedGroup ? .white : .white.opacity(0.55)).frame(maxWidth: .infinity).padding(.vertical, 10).overlay(alignment: .bottom) { if i == selectedGroup { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } } } }.padding(.horizontal, 16)
             HStack { Image(systemName: "magnifyingglass").foregroundStyle(.secondary); TextField("搜索消息", text: $search).foregroundStyle(.primary).tint(.primary) }.padding(.horizontal, 14).frame(height: 42).background(Color.white.opacity(0.10)).clipShape(Capsule()).padding(.horizontal, 16)
         }.padding(.top, 18).padding(.bottom, 12)
     }
