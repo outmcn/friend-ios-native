@@ -26,12 +26,15 @@ struct DiscoveryPost: Identifiable {
 struct DiscoveryView: View {
     @StateObject private var model = DiscoveryViewModel()
     var body: some View {
-        ZStack {
-            Color(red: 0.02, green: 0.03, blue: 0.07).ignoresSafeArea()
-            VStack(spacing: 0) {
-                header
-                ScrollView(showsIndicators: false) {
-                    LazyVStack(spacing: 14) { ForEach(model.posts) { post in postCard(post) } }.padding(.horizontal, 14).padding(.top, 14).padding(.bottom, 90)
+        GeometryReader { proxy in
+            ZStack {
+                Color(red: 0.02, green: 0.03, blue: 0.07).ignoresSafeArea()
+                VStack(spacing: 0) {
+                    Color.clear.frame(height: max(proxy.safeAreaInsets.top, 44))
+                    header
+                    ScrollView(showsIndicators: false) {
+                        LazyVStack(spacing: 14) { ForEach(model.posts) { post in postCard(post) } }.padding(.horizontal, 14).padding(.top, 14).padding(.bottom, 90)
+                    }
                 }
             }
         }
