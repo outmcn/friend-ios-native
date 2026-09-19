@@ -17,7 +17,7 @@ struct MessageView: View {
                     ScrollView(showsIndicators: false) {
                         if selectedGroup == 1 {
                             LazyVStack(spacing: 0) {
-                                if let error = friends.error { Text(error).foregroundStyle(.red).padding() }
+                                if let message = friends.error { Text(message).foregroundStyle(.red).padding() }
                                 ForEach(friends.filtered(search)) { friend in
                                     NavigationLink { ChatView(friend: friend) } label: { friendRow(friend) }.buttonStyle(.plain)
                                 }
@@ -26,19 +26,22 @@ struct MessageView: View {
                         } else {
                             LazyVStack(spacing: 0) { ForEach(filtered) { item in messageRow(item) } }
                         }
-                    }
-                    .padding(.bottom, 120)
+                    }.padding(.bottom, 120)
                 }
             }
-        }
-        .navigationBarHidden(true)
-        .task { await friends.load() }
+        }.navigationBarHidden(true).task { await friends.load() }
     }
 
     private var filtered: [MessageItem] { let source = messages.filter { $0.name != "好友消息" }; return search.isEmpty ? source : source.filter { $0.name.localizedCaseInsensitiveContains(search) || $0.preview.localizedCaseInsensitiveContains(search) } }
     private var header: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 0) { ForEach(["消息", "好友"].indices, id: \.self) { i in Button { selectedGroup = i } label: { Text(["消息", "好友"][i]).font(.system(size: i == selectedGroup ? 18 : 16, weight: i == selectedGroup ? .bold : .regular)).foregroundStyle(i == selectedGroup ? .white : .white.opacity(0.55)).frame(maxWidth: .infinity).padding(.vertical, 10).overlay(alignment: .bottom) { if i == selectedGroup { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } } } }.padding(.horizontal, 16)
+            HStack(spacing: 0) {
+                ForEach(["消息", "好友"].indices, id: \.self) { i in
+                    Button { selectedGroup = i } label: {
+                        Text(["消息", "好友"][i]).font(.system(size: i == selectedGroup ? 18 : 16, weight: i == selectedGroup ? .bold : .regular)).foregroundStyle(i == selectedGroup ? .white : .white.opacity(0.55)).frame(maxWidth: .infinity).padding(.vertical, 10).overlay(alignment: .bottom) { if i == selectedGroup { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } }
+                    }
+                }
+            }.padding(.horizontal, 16)
             HStack { Image(systemName: "magnifyingglass").foregroundStyle(.secondary); TextField(selectedGroup == 1 ? "搜索好友" : "搜索消息", text: $search).foregroundStyle(.primary).tint(.primary) }.padding(.horizontal, 14).frame(height: 42).background(Color.white.opacity(0.10)).clipShape(Capsule()).padding(.horizontal, 16)
         }.padding(.top, 18).padding(.bottom, 12)
     }
@@ -51,8 +54,12 @@ struct FriendItem: Codable, Identifiable { let id: Int; let headPortrait: String
 @MainActor final class FriendsViewModel: ObservableObject {
     @Published var items: [FriendItem] = []
     @Published var error: String?
-    func load() async { do { let r: APIEnvelope<PageResult<FriendItem>> = try await APIClient.shared.request(path: "community/fruser/friend/page", method: "GET", body: DiscoveryQuery(pageIndex: 1, pageSize: 100)); guard r.code == 200 else { throw APIError(statusCode: r.code, message: r.msg ?? "好友列表加载失败") }; items = r.data?.rows ?? []; error = nil } catch { error = error.localizedDescription } }
-    func filtered(_ search: String) -> [FriendItem] { search.isEmpty ? items : items.filter { ($0.nickName ?? "").localizedCaseInsensitiveContains(search) } }
+    func load() async {
+        do { let r: APIEnvelope<PageResult<FriendItem>> = try await APIClient.shared.request(path: "community/fruser/friend/page", method: "GET", body: DiscoveryQuery(pageIndex: 1, pageSize: 100)); guard r.code == 200 else { throw APIError(statusCode: r.code, message: r.msg ?? "好友列表加载失败") }; items = r.data?.rows ?? []; error = nil }
+        catch { let caught = error; self.error = caught.localizedDescription }
+    }
+    func filtered(_ search: String) -> [FriendItem] { search.isEmpty ? items : items.filter { ($0.nickName ?? "").localizedCaseInsensitiveContains(search) }
+    }
 }
 
 struct ChatView: View {
@@ -67,5 +74,4 @@ struct ChatView: View {
     }
 }
 struct ChatMessage: Identifiable { let id = UUID(); let text: String; let mine: Bool }
-
 struct MessageItem: Identifiable { let id = UUID(); let name: String; let preview: String; let time: String; let icon: String; let color: Color; static let placeholders = [MessageItem(name: "系统消息", preview: "欢迎来到谈笑", time: "刚刚", icon: "bell.fill", color: .purple), MessageItem(name: "匹配消息", preview: "等待新的匹配消息", time: "昨天", icon: "waveform", color: .blue)] }
