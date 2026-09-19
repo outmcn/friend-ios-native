@@ -7,7 +7,7 @@ struct AvatarActionSheet: View {
     @State private var logoutPending = false
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
+            VStack {
                 HStack(spacing: 0) { tab("资料", 0); tab("设置", 1) }.background(Color(.secondarySystemBackground))
                 if selectedTab == 0 { profileContent } else { settingsContent }
             }

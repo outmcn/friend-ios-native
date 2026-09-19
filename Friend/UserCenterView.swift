@@ -59,6 +59,7 @@ struct UserCenterView: View {
             VStack(alignment: .leading, spacing: px(18, w)) {
                 HStack(spacing: px(18, w)) {
                     Text(info.nickName ?? "用户").font(.system(size: px(40, w), weight: .bold)).foregroundStyle(.white)
+                    Button("编辑") { showProfileEditor = true }.font(.system(size: px(22, w), weight: .medium)).foregroundStyle(Color(red: 0.95, green: 0.80, blue: 0.38))
                     Text(info.genderText).font(.system(size: px(25, w))).foregroundStyle(.pink)
                     Text("IP \((info.city ?? cachedCity ?? "未知").replacingOccurrences(of: "市", with: ""))").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65))
                 }
