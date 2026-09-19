@@ -19,7 +19,31 @@ struct UserCenterView: View {
     private func loadAll() async { await model.loadIfNeeded(); dynamics.loadIfNeeded(); Task { do { try await dynamics.load() } catch { dynamics.errorMessage = error.localizedDescription } } }
     private func refreshAll() async { await model.refresh(); do { try await dynamics.load() } catch { dynamics.errorMessage = error.localizedDescription } }
     private func topBar(width w: CGFloat) -> some View { HStack { HStack(spacing: 0) { Spacer(); Button { showUserMenu = true } label: { ProfileActionIcon(kind: .menu).frame(width: px(38, w), height: px(38, w)) } }.font(.system(size: px(32, w), weight: .medium)).foregroundStyle(Color(white: 0.96)).frame(height: px(60, w)) }.frame(height: px(52, w)) }
-    private func profile(_ info: PersonalCenter, width w: CGFloat) -> some View { HStack(spacing: px(24, w)) { VStack(alignment: .leading, spacing: px(18, w)) { HStack(spacing: px(18, w)) { Text(info.nickName ?? "用户").font(.system(size: px(40, w), weight: .bold)).foregroundStyle(.white); Text(info.genderText).font(.system(size: px(25, w))).foregroundStyle(.pink); Text("IP：\(info.city ?? cachedCity ?? "未知")").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65)) }; HStack(spacing: px(32, w)) { statValue("\(info.followCount ?? 0)", "关注", w); statValue("\(info.fansCount ?? 0)", "粉丝", w); statValue("\(info.likeCount ?? 0)", "赞", w) } }; Spacer(minLength: 0); Button { showProfileEditor = true } label: { RemoteAvatar(urlString: info.headPortrait, size: px(140, w)) }.buttonStyle(.plain) }.padding(.top, px(34, w)) }
+    private func profile(_ info: PersonalCenter, width w: CGFloat) -> some View {
+        HStack(spacing: px(24, w)) {
+            VStack(alignment: .leading, spacing: px(18, w)) {
+                HStack(spacing: px(18, w)) {
+                    Text(info.nickName ?? "用户").font(.system(size: px(40, w), weight: .bold)).foregroundStyle(.white)
+                    Text(info.genderText).font(.system(size: px(25, w))).foregroundStyle(.pink)
+                    Text("IP：\(info.city ?? cachedCity ?? "未知")").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65))
+                }
+                HStack(spacing: px(32, w)) {
+                    statValue("\(info.followCount ?? 0)", "关注", w)
+                    statValue("\(info.fansCount ?? 0)", "粉丝", w)
+                    statValue("\(info.likeCount ?? 0)", "赞", w)
+                }
+            }
+            Spacer(minLength: 0)
+            Button { showProfileEditor = true } label: { RemoteAvatar(urlString: info.headPortrait, size: px(140, w)) }.buttonStyle(.plain)
+        }
+        .padding(.horizontal, px(28, w))
+        .padding(.vertical, px(26, w))
+        .background(Color.black.opacity(0.38))
+        .overlay(RoundedRectangle(cornerRadius: px(24, w)).stroke(Color.white.opacity(0.16), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: px(24, w)))
+        .shadow(color: .black.opacity(0.25), radius: px(16, w), y: px(8, w))
+        .padding(.top, px(22, w))
+    }
     private func statValue(_ value: String, _ title: String, _ w: CGFloat) -> some View { VStack(alignment: .leading, spacing: 2) { Text(value).font(.system(size: px(28, w), weight: .bold)).foregroundStyle(.white); Text(title).font(.system(size: px(22, w))).foregroundStyle(.white.opacity(0.62)) } }
     private func dynamicList(width w: CGFloat) -> some View { VStack(alignment: .leading, spacing: 12) { Text("我的动态").font(.system(size: px(32, w), weight: .bold)).foregroundStyle(.white); if dynamics.items.isEmpty { if let error=dynamics.errorMessage { Text(error).font(.system(size: px(24, w))).foregroundStyle(.red) } else { Text("暂无动态").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.6)) } } else { ForEach(dynamics.items) { blogCard($0, w) } } }.padding(.top, px(54, w)).padding(.bottom, px(50, w)) }
     private func blogCard(_ blog: BlogPageResponse, _ w: CGFloat) -> some View { NavigationLink { DynamicDetailView(blog: blog) } label: { VStack(alignment: .leading, spacing: 10) { HStack { Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.white.opacity(0.6)); Spacer() }; if let content = blog.content, !content.isEmpty { Text(content).font(.system(size: 16)).foregroundStyle(.white) }; if let images = blog.images { ForEach(images, id: \.self) { image in DynamicImageView(urlString: image) } }; HStack { Label("\(blog.fabulous ?? 0)", systemImage: "heart"); Label("\(blog.comment ?? 0)", systemImage: "message") }.font(.footnote).foregroundStyle(.white.opacity(0.75)) }.padding(14).frame(maxWidth: .infinity, alignment: .leading).background(Color.white.opacity(0.12)).clipShape(RoundedRectangle(cornerRadius: 16)) }.buttonStyle(.plain) }
