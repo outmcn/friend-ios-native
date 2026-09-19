@@ -12,7 +12,7 @@ struct VideoMatchingSheet: View {
                 Image("FriendVideoMatchingBg").resizable().scaledToFill().ignoresSafeArea()
                 Color.black.opacity(0.12).ignoresSafeArea()
                 VStack(spacing: 0) {
-                    HStack { Text("视频匹配").font(.system(size: px(32,w), weight: .medium)).foregroundStyle(Color(red:0.87,green:0.89,blue:0.98)).shadow(color:.white.opacity(0.56),radius:px(8,w)); Spacer(); Button("取消") { dismiss() }.foregroundStyle(.white) }.padding(.horizontal, px(30,w)).padding(.top, 12)
+                    Color.clear.frame(height: 12)
                     ZStack {
                         Image("FriendVideoMatchingRing").resizable().scaledToFit().frame(width: w, height: px(520,w))
                         Circle().fill(Color(red:0.57,green:0.62,blue:0.89)).frame(width:px(150,w),height:px(152,w)).overlay(Circle().stroke(Color(red:0.72,green:0.75,blue:0.93),lineWidth:px(8,w))).shadow(color:.indigo.opacity(0.7),radius:px(8,w))
