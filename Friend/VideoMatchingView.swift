@@ -13,7 +13,7 @@ struct VideoMatchingView: View {
                 VStack(spacing: 0) {
                     Color.clear.frame(height: proxy.safeAreaInsets.top)
                     HStack { Button { dismiss() } label: { Image("FriendWhiteBack").resizable().scaledToFit().frame(width:px(44,w),height:px(44,w)) }; Spacer(); Text("视频匹配").font(.system(size:px(36,w),weight:.medium)).foregroundStyle(Color(red:0.87,green:0.89,blue:0.98)).shadow(color:.white.opacity(0.56),radius:px(10,w)); Spacer(); Color.clear.frame(width:px(44,w),height:px(44,w)) }.padding(.horizontal,px(32,w))
-                    if model.state == .matching { matchingContent(width:w) } else if model.state == .matched { matchedContent(width:w) } else if model.state == .ended { endedContent(width:w) } else { startContent(width:w) }
+                    if model.isMatching { matchingContent(width:w) } else if model.match != nil { matchedContent(width:w) } else { startContent(width:w) }
                     Spacer()
                 }
             }
