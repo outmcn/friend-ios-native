@@ -4,12 +4,15 @@ struct MessageView: View {
     @State private var search = ""
     @State private var messages = MessageItem.placeholders
     var body: some View {
-        ZStack {
-            Color(red: 0.02, green: 0.03, blue: 0.07).ignoresSafeArea()
-            VStack(spacing: 0) {
-                header
-                ScrollView(showsIndicators: false) {
-                    LazyVStack(spacing: 0) { ForEach(filtered) { item in messageRow(item) } }.padding(.bottom, 120)
+        GeometryReader { proxy in
+            ZStack {
+                Color(red: 0.02, green: 0.03, blue: 0.07).ignoresSafeArea()
+                VStack(spacing: 0) {
+                    Color.clear.frame(height: max(proxy.safeAreaInsets.top, 44))
+                    header
+                    ScrollView(showsIndicators: false) {
+                        LazyVStack(spacing: 0) { ForEach(filtered) { item in messageRow(item) } }.padding(.bottom, 120)
+                    }
                 }
             }
         }.navigationBarHidden(true)
