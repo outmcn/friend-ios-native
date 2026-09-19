@@ -1,59 +1,20 @@
 import Foundation
 import SwiftUI
 
-@MainActor
-final class DiscoveryViewModel: ObservableObject {
+@MainActor final class DiscoveryViewModel: ObservableObject {
     @Published var selectedTab = 0
-    @Published var posts: [DiscoveryPost] = DiscoveryPost.placeholders
+    @Published var posts: [DiscoveryPost] = []
     @Published var isLoading = false
-    func load() async { isLoading = true; defer { isLoading = false } }
+    @Published var errorMessage: String?
+    func load() async { isLoading = true; defer { isLoading = false }; do { let path = selectedTab == 0 ? "community/frblog/near/blog/page" : selectedTab == 1 ? "community/frblog/near/blog/page" : "community/frblog/follow/blog/page"; let r: APIEnvelope<PageResult<BlogPageResponse>> = try await APIClient.shared.request(path: path, method: "GET", body: DiscoveryQuery(pageIndex: 1, pageSize: 50)); guard r.code == 200, let rows = r.data?.rows else { throw APIError(statusCode: r.code, message: r.msg ?? "动态加载失败") }; posts = rows.map { DiscoveryPost($0) }; errorMessage = nil } catch { errorMessage = error.localizedDescription } }
 }
-
-struct DiscoveryPost: Identifiable {
-    let id = UUID()
-    let name: String
-    let text: String
-    let imageName: String?
-    let likes: Int
-    let comments: Int
-    static let placeholders = [
-        DiscoveryPost(name: "赵风了一", text: "山雨欲来风满楼", imageName: nil, likes: 234, comments: 23),
-        DiscoveryPost(name: "赵风了一", text: "山雨欲来风满楼", imageName: nil, likes: 453, comments: 23),
-        DiscoveryPost(name: "赵风了一", text: "风渺渺沙兮裂，袅袅兮秋风", imageName: nil, likes: 0, comments: 0)
-    ]
-}
+struct DiscoveryQuery: Encodable { let pageIndex: Int; let pageSize: Int }
+struct DiscoveryPost: Identifiable { let id: Int; let name: String; let text: String; let imageURL: String?; let likes: Int; let comments: Int; let pushTime: String?; let headPortrait: String?; init(_ blog: BlogPageResponse) { id=blog.id; name=blog.nickName ?? "用户"; text=blog.content ?? ""; imageURL=blog.images?.first; likes=blog.fabulous ?? 0; comments=blog.comment ?? 0; pushTime=blog.pushTime; headPortrait=blog.headPortrait } }
 
 struct DiscoveryView: View {
-    @StateObject private var model = DiscoveryViewModel()
-    @State private var showCompose = false
-    var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                Color(red: 0.02, green: 0.03, blue: 0.07).ignoresSafeArea()
-                VStack(spacing: 0) {
-                    Color.clear.frame(height: max(proxy.safeAreaInsets.top, 44))
-                    header
-                    ScrollView(showsIndicators: false) {
-                        LazyVStack(spacing: 14) { ForEach(model.posts) { post in postCard(post) } }.padding(.horizontal, 14).padding(.top, 14).padding(.bottom, 140)
-                    }
-                }
-            }
-        }
-        .navigationBarHidden(true)
-        .sheet(isPresented: $showCompose) { ComposePostView(onPublished: { model.posts = DiscoveryPost.placeholders }) }
-        .task { await model.load() }
+    @StateObject private var model = DiscoveryViewModel(); @State private var showCompose = false
+    var body: some View { GeometryReader { proxy in ZStack { Color(red:0.02,green:0.03,blue:0.07).ignoresSafeArea(); VStack(spacing:0) { Color.clear.frame(height:max(proxy.safeAreaInsets.top,44)); header; ScrollView(showsIndicators:false) { if let error=model.errorMessage { Text(error).foregroundStyle(.red).padding() }; LazyVStack(spacing:14){ForEach(model.posts){post in postCard(post)}}.padding(.horizontal,14).padding(.top,14).padding(.bottom,140) } } } }.navigationBarHidden(true).sheet(isPresented:$showCompose){ComposePostView(onPublished:{Task{await model.load()}})}.task{await model.load()}.onChange(of:model.selectedTab){_ in Task{await model.load()}}
     }
-    private var header: some View {
-        VStack(spacing: 0) {
-            HStack { ForEach(["推荐", "附近", "关注"].indices, id: \.self) { i in Button { model.selectedTab = i } label: { Text(["推荐", "附近", "关注"][i]).font(.system(size: i == model.selectedTab ? 18 : 16, weight: i == model.selectedTab ? .bold : .regular)).foregroundStyle(i == model.selectedTab ? .white : .white.opacity(0.55)).padding(.horizontal, 12).padding(.vertical, 10).overlay(alignment: .bottom) { if i == model.selectedTab { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } } } }; Spacer(); Button("发一条") { showCompose = true }.font(.system(size: 15, weight: .medium)).foregroundStyle(Color(red: 0.95, green: 0.80, blue: 0.38)) }.padding(.horizontal, 18).padding(.top, 12).padding(.bottom, 4)
-        }
-    }
-    private func postCard(_ post: DiscoveryPost) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) { Circle().fill(Color.white.opacity(0.22)).frame(width: 40, height: 40).overlay(Image(systemName: "person.fill").foregroundStyle(.white.opacity(0.8))); Text(post.name).font(.system(size: 16, weight: .medium)).foregroundStyle(.white); Spacer() }
-            Text(post.text).font(.system(size: 17, weight: .medium)).foregroundStyle(.white)
-            RoundedRectangle(cornerRadius: 12).fill(LinearGradient(colors: [Color(red:0.16,green:0.26,blue:0.50),Color(red:0.90,green:0.47,blue:0.28)], startPoint: .topLeading, endPoint: .bottomTrailing)).frame(height: 150).overlay(Image(systemName: "photo").font(.system(size: 34)).foregroundStyle(.white.opacity(0.55)))
-            HStack(spacing: 24) { Label("\(post.likes)", systemImage: "heart"); Label("\(post.comments)", systemImage: "message") }.font(.system(size: 14)).foregroundStyle(.white.opacity(0.65))
-        }.padding(14).background(Color.white.opacity(0.08)).clipShape(RoundedRectangle(cornerRadius: 16))
-    }
+    private var header: some View { VStack(spacing:0){ HStack{ForEach(["推荐","附近","关注"].indices,id:\.self){i in Button{model.selectedTab=i}label:{Text(["推荐","附近","关注"][i]).font(.system(size:i==model.selectedTab ? 18:16,weight:i==model.selectedTab ? .bold:.regular)).foregroundStyle(i==model.selectedTab ? .white:.white.opacity(0.55)).padding(.horizontal,12).padding(.vertical,10).overlay(alignment:.bottom){if i==model.selectedTab{Color(red:0.95,green:0.80,blue:0.38).frame(height:2)}}}};Spacer();Button("发一条"){showCompose=true}.foregroundStyle(Color(red:0.95,green:0.80,blue:0.38))}.padding(.horizontal,18).padding(.top,12).padding(.bottom,4)} }
+    private func postCard(_ post:DiscoveryPost)->some View { VStack(alignment:.leading,spacing:12){ HStack(spacing:10){RemoteAvatar(urlString:post.headPortrait,size:40);VStack(alignment:.leading,spacing:3){Text(post.name).font(.system(size:16,weight:.medium)).foregroundStyle(.white);Text(post.pushTime ?? "").font(.caption).foregroundStyle(.white.opacity(0.55))};Spacer();Button("关注"){}.font(.caption).foregroundStyle(Color(red:0.95,green:0.80,blue:0.38))}; if !post.text.isEmpty{Text(post.text).font(.system(size:17,weight:.medium)).foregroundStyle(.white)}; if let url=post.imageURL{DynamicImageView(urlString:url)}else{DynamicImagePlaceholder()};HStack(spacing:24){Label("\(post.likes)",systemImage:"heart");Label("\(post.comments)",systemImage:"message")}.font(.system(size:14)).foregroundStyle(.white.opacity(0.65))}.padding(14).background(Color.white.opacity(0.08)).clipShape(RoundedRectangle(cornerRadius:16)) }
 }
