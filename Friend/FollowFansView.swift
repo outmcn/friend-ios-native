@@ -18,13 +18,13 @@ struct FollowFansView: View {
                     ForEach(model.items) { item in row(item) }
                 }
             }
-            .refreshable { await model.load(tab: tab) }
+            .task(id: tab) { await model.load(tab: tab) }
         }
         .background(Color(.systemBackground).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: tab) { _ in Task { await model.load(tab: tab) } }
-        .task { tab = initialTab; await model.load(tab: initialTab) }
+        .task { tab = initialTab }
+
     }
 
     private func tabButton(_ title: String, _ value: Int) -> some View {
