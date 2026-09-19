@@ -40,7 +40,7 @@ struct DiscoveryView: View {
             }
         }
         .navigationBarHidden(true)
-        .sheet(isPresented: $showCompose) { ComposePostView() }
+        .sheet(isPresented: $showCompose) { ComposePostView(onPublished: { model.posts = DiscoveryPost.placeholders }) }
         .task { await model.load() }
     }
     private var header: some View {

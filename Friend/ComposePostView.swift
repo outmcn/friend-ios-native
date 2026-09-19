@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ComposePostView: View {
     @Environment(\.dismiss) private var dismiss
+    var onPublished: (() -> Void)?
     @State private var text = ""
     @State private var selectedImage: UIImage?
     @State private var showPicker = false
@@ -19,5 +20,5 @@ struct ComposePostView: View {
         }
     }
     private func upload(_ image: UIImage) async throws -> String { guard let data = image.jpegData(compressionQuality: 0.85) else { throw APIError(statusCode: nil, message: "图片压缩失败") }; let result = try await APIClient.shared.uploadFile(data: data, filename: "dynamic-\(UUID().uuidString).jpg", mimeType: "image/jpeg"); guard let url = result.data?.url else { throw APIError(statusCode: result.code, message: result.msg ?? "图片上传失败") }; return url }
-    private func publish() async { isPublishing = true; publishError = nil; do { let imageURL: String? = if let image = selectedImage { try await upload(image) } else { nil }; let body = BlogSubmitRequest(content: text.isEmpty ? nil : text, images: imageURL.map { [$0] }, lon: nil, lat: nil, city: LocationRefreshService.shared.cachedCity); let response: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "community/frblog/submit", method: "POST", body: body); guard response.code == 200 else { throw APIError(statusCode: response.code, message: response.msg ?? "发布失败") }; dismiss() } catch { publishError = error.localizedDescription }; isPublishing = false }
+    private func publish() async { isPublishing = true; publishError = nil; do { let imageURL: String? = if let image = selectedImage { try await upload(image) } else { nil }; let body = BlogSubmitRequest(content: text.isEmpty ? nil : text, images: imageURL.map { [$0] }, lon: nil, lat: nil, city: LocationRefreshService.shared.cachedCity); let response: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "community/frblog/submit", method: "POST", body: body); guard response.code == 200 else { throw APIError(statusCode: response.code, message: response.msg ?? "发布失败") }; onPublished?(); dismiss() } catch { publishError = error.localizedDescription }; isPublishing = false }
 }
