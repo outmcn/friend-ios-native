@@ -25,7 +25,7 @@ struct UserCenterView: View {
                 HStack(spacing: px(18, w)) {
                     Text(info.nickName ?? "用户").font(.system(size: px(40, w), weight: .bold)).foregroundStyle(.white)
                     Text(info.genderText).font(.system(size: px(25, w))).foregroundStyle(.pink)
-                    Text("IP：\(info.city ?? cachedCity ?? "未知")").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65))
+                    Text("IP \((info.city ?? cachedCity ?? "未知").replacingOccurrences(of: "市", with: ""))").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65))
                 }
                 HStack(spacing: px(32, w)) {
                     statValue("\(info.followCount ?? 0)", "关注", w)
