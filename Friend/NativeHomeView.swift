@@ -46,19 +46,19 @@ struct NativeHomeView: View {
     }
 
     private func starUserRecommendations(width: CGFloat, top: CGFloat) -> some View {
-        let names = model.users.prefix(3).map { $0.nickName ?? "用户" }
-        return VStack(spacing: px(18, width)) {
-            Text("视频聊，更靠谱").font(.system(size: px(36, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.45), radius: px(8, width))
-            HStack(alignment: .top, spacing: px(22, width)) {
-                recommendation(user: model.users.indices.contains(0) ? model.users[0] : nil, caption: "送给你的小姐姐", width: width, size: px(92, width))
-                recommendation(user: model.users.indices.contains(1) ? model.users[1] : nil, caption: "\(names.count > 1 ? names[1] : "For you")", width: width, size: px(122, width))
-                recommendation(user: model.users.indices.contains(2) ? model.users[2] : nil, caption: "For you", width: width, size: px(92, width))
+        let avatarSize = px(104, width)
+        return VStack(alignment: .leading, spacing: px(34, width)) {
+            Text("视频聊，更靠谱").font(.system(size: px(36, width), weight: .regular)).foregroundStyle(Color(red:0.87,green:0.89,blue:0.98))
+            HStack(alignment: .top, spacing: 0) {
+                recommendation(user: model.users.indices.contains(0) ? model.users[0] : nil, caption: "送给你的小姐姐", width: width, size: avatarSize)
+                recommendation(user: model.users.indices.contains(1) ? model.users[1] : nil, caption: "For you", width: width, size: avatarSize)
+                recommendation(user: model.users.indices.contains(2) ? model.users[2] : nil, caption: "For you", width: width, size: avatarSize)
             }
-        }.frame(maxWidth: .infinity).padding(.top, top + px(92, width))
+        }.padding(.horizontal, px(56, width)).padding(.top, top + px(145, width)).frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func recommendation(user: DiscoveryUser?, caption: String, width: CGFloat, size: CGFloat) -> some View {
-        VStack(spacing: px(8, width)) { if let user { RemoteAvatar(urlString: user.headPortrait, size: size) } else { Circle().fill(Color.white.opacity(0.18)).frame(width: size, height: size).overlay(Image(systemName: "person.fill").foregroundStyle(.white.opacity(0.7))) }; Text(user?.nickName ?? caption).font(.system(size: px(20, width), weight: .medium)).foregroundStyle(.white).lineLimit(1) }.frame(maxWidth: .infinity)
+        VStack(spacing: px(8, width)) { if let user { RemoteAvatar(urlString: user.headPortrait, size: size) } else { Circle().fill(Color.white.opacity(0.18)).frame(width: size, height: size).overlay(Image(systemName: "person.fill").foregroundStyle(.white.opacity(0.7))) }; Text(caption).font(.system(size: px(30, width), weight: .bold)).foregroundStyle(.white).lineLimit(1) }.frame(maxWidth: .infinity)
     }
 
     private func sourceHeader(width: CGFloat, top: CGFloat) -> some View {
