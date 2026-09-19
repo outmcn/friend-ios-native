@@ -6,9 +6,7 @@ struct UserCenterView: View {
     @State private var showLogin = false
     @State private var cachedCity: String?
     @State private var showProfileEditor = false
-    @State private var showUserMenu = false
-    @State private var showFootsteps = false
-    @State private var showScanner = false
+    @State private var showAvatarActions = false
     @State private var selectedDynamicsCategory = 0
     let topSafeArea: CGFloat?
     private let designWidth: CGFloat = 750
@@ -51,11 +49,11 @@ struct UserCenterView: View {
                     }
                 }
             }
-        }.navigationTitle("").navigationBarHidden(true).sheet(isPresented: $showLogin) { NavigationView { LoginView() } }.sheet(isPresented: $showProfileEditor) { if let info = model.userInfo { ProfileEditorSheet(info: info) } }.sheet(isPresented: $showUserMenu) { UserMenuSheet() }.sheet(isPresented: $showFootsteps) { FootstepsSheet() }.sheet(isPresented: $showScanner) { ScannerSheet() }.task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }.onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
+        }.navigationTitle("").navigationBarHidden(true).sheet(isPresented: $showLogin) { NavigationView { LoginView() } }.sheet(isPresented: $showProfileEditor) { if let info = model.userInfo { ProfileEditorSheet(info: info) } }.sheet(isPresented: $showAvatarActions) { if let info = model.userInfo { AvatarActionSheet(info: info) } }.task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }.onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
     }
     private func loadAll() async { await model.loadIfNeeded(); dynamics.loadIfNeeded(); Task { do { try await dynamics.load() } catch { dynamics.errorMessage = error.localizedDescription } } }
     private func refreshAll() async { await model.refresh(); do { try await dynamics.load() } catch { dynamics.errorMessage = error.localizedDescription } }
-    private func topBar(width w: CGFloat) -> some View { HStack { Spacer(); HStack(spacing: px(16, w)) { Button { showFootsteps = true } label: { TwinFootstepsIcon() }.frame(width: px(46, w), height: px(48, w)); Button { showScanner = true } label: { ScanCodeIcon() }.frame(width: px(46, w), height: px(48, w)); Button { showUserMenu = true } label: { MenuLinesIcon() }.frame(width: px(46, w), height: px(48, w)) }.frame(width: px(190, w), alignment: .trailing).padding(.trailing, px(16, w)) }.frame(height: px(52, w)) }
+    private func topBar(width w: CGFloat) -> some View { HStack { Spacer() }.frame(height: px(52, w)) }
     private func profile(_ info: PersonalCenter, width w: CGFloat) -> some View {
         HStack(spacing: px(24, w)) {
             VStack(alignment: .leading, spacing: px(18, w)) {
@@ -67,11 +65,11 @@ struct UserCenterView: View {
                 HStack(spacing: px(32, w)) {
                     statValue("\(info.followCount ?? 0)", "关注", w)
                     statValue("\(info.fansCount ?? 0)", "粉丝", w)
-                    statValue("\(info.likeCount ?? 0)", "赞", w)
+                    statValue("\(info.likeCount ?? 0)", "获赞", w)
                 }
             }
             Spacer(minLength: 0)
-            Button { showProfileEditor = true } label: { RemoteAvatar(urlString: info.headPortrait, size: px(140, w)) }.buttonStyle(.plain)
+            Button { showAvatarActions = true } label: { RemoteAvatar(urlString: info.headPortrait, size: px(140, w)) }.buttonStyle(.plain)
         }
         .padding(.horizontal, px(28, w))
         .padding(.vertical, px(26, w))
