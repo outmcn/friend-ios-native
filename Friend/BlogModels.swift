@@ -12,4 +12,5 @@ struct BlogPageResponse: Codable, Identifiable {
     let comment: Int?
     let thumbsUp: Bool?
     let favorite: Int?
+    let favorited: Bool?
 }
