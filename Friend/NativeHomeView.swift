@@ -43,17 +43,16 @@ struct NativeHomeView: View {
     }
 
     private func starPlaceholders(width: CGFloat, top: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: px(34, width)) {
-            HStack(spacing: 0) {
-                placeholderCard(width: width, tint: Color(red:0.19,green:0.47,blue:0.94), icon: "bolt.fill")
-                placeholderCard(width: width, tint: Color(red:0.55,green:0.25,blue:0.86), icon: "headphones")
-                placeholderCard(width: width, tint: Color(red:0.88,green:0.25,blue:0.65), icon: "sparkles")
-            }
-        }.padding(.horizontal, px(32, width)).padding(.top, top + px(112, width)).frame(maxWidth: .infinity, alignment: .leading)
+        let gap = px(14, width), cardWidth = (width - px(64, width) - gap) / 2
+        return VStack(spacing: gap) {
+            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.18,green:0.48,blue:0.94), icon: "bolt.fill"); placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.50,green:0.23,blue:0.84), icon: "headphones") }
+            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.92,green:0.26,blue:0.65), icon: "sparkles"); placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.95,green:0.34,blue:0.52), icon: "heart.fill") }
+            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.58,green:0.25,blue:0.78), icon: "wineglass.fill"); placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.89,green:0.90,blue:0.96), icon: "ghost.fill", darkIcon: true) }
+        }.padding(.horizontal, px(32, width)).padding(.top, top + px(112, width)).frame(maxWidth: .infinity)
     }
 
-    private func placeholderCard(width: CGFloat, tint: Color, icon: String) -> some View {
-        VStack(spacing: px(10, width)) { RoundedRectangle(cornerRadius: px(18, width)).fill(LinearGradient(colors: [tint.opacity(0.9), tint.opacity(0.45)], startPoint: .topLeading, endPoint: .bottomTrailing)).frame(width: px(208, width), height: px(208, width)).overlay(Image(systemName: icon).font(.system(size: px(48, width), weight: .bold)).foregroundStyle(.white.opacity(0.9))); Text("占位内容").font(.system(size: px(22, width), weight: .medium)).foregroundStyle(.white.opacity(0.85)) }.frame(maxWidth: .infinity)
+    private func placeholderCard(width: CGFloat, height: CGFloat, tint: Color, icon: String, darkIcon: Bool = false) -> some View {
+        RoundedRectangle(cornerRadius: px(18, width)).fill(LinearGradient(colors: [tint.opacity(0.95), tint.opacity(0.55)], startPoint: .topLeading, endPoint: .bottomTrailing)).frame(width: width, height: height).overlay(alignment: .center) { Image(systemName: icon).font(.system(size: min(width, height) * 0.28, weight: .bold)).foregroundStyle(darkIcon ? .black.opacity(0.55) : .white.opacity(0.92)) }.overlay(alignment: .bottomLeading) { Text("占位内容").font(.system(size: px(16, width), weight: .medium)).foregroundStyle(darkIcon ? .black.opacity(0.65) : .white.opacity(0.85)).padding(.leading, px(14, width)).padding(.bottom, px(12, width)) }
     }
 
     private func sourceHeader(width: CGFloat, top: CGFloat) -> some View {
