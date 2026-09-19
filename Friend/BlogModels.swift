@@ -14,4 +14,5 @@ struct BlogPageResponse: Codable, Identifiable {
     let favorite: Int?
     let favorited: Bool?
     let following: Bool?
+    let distanceKm: Double?
 }
