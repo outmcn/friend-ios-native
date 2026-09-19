@@ -15,7 +15,7 @@ struct MessageView: View {
                     Color.clear.frame(height: max(proxy.safeAreaInsets.top, 44))
                     header
                     ScrollView(showsIndicators: false) {
-                        if selectedGroup == 1 {
+                        if selectedGroup == 2 {
                             LazyVStack(spacing: 0) {
                                 if let message = friends.error { Text(message).foregroundStyle(.red).padding() }
                                 ForEach(friends.filtered(search)) { friend in
@@ -24,7 +24,7 @@ struct MessageView: View {
                                 if friends.items.isEmpty && friends.error == nil { Text("暂无好友").foregroundStyle(.white.opacity(0.6)).padding(.top, 50) }
                             }
                         } else {
-                            LazyVStack(spacing: 0) { ForEach(filtered) { item in messageRow(item) } }
+                            LazyVStack(spacing: 0) { ForEach(selectedGroup == 1 ? notifications : filtered) { item in messageRow(item) } }
                         }
                     }.padding(.bottom, 120)
                 }
@@ -32,18 +32,19 @@ struct MessageView: View {
         }.navigationBarHidden(true).task { await friends.load() }
     }
 
-    private var filtered: [MessageItem] { let source = messages.filter { $0.name != "好友消息" }; return search.isEmpty ? source : source.filter { $0.name.localizedCaseInsensitiveContains(search) || $0.preview.localizedCaseInsensitiveContains(search) } }
+    private var filtered: [MessageItem] { let source = messages; return search.isEmpty ? source : source.filter { $0.name.localizedCaseInsensitiveContains(search) || $0.preview.localizedCaseInsensitiveContains(search) } }
+    private var notifications: [MessageItem] { let source = messages.filter { $0.name == "系统消息" || $0.name == "匹配消息" }; return search.isEmpty ? source : source.filter { $0.name.localizedCaseInsensitiveContains(search) || $0.preview.localizedCaseInsensitiveContains(search) } }
     private var header: some View {
         HStack(spacing: 0) {
             HStack(spacing: 0) {
-                ForEach(["消息", "好友"].indices, id: \.self) { i in
+                ForEach(["消息", "通知", "好友"].indices, id: \.self) { i in
                     Button { selectedGroup = i } label: {
-                        Text(["消息", "好友"][i]).font(.system(size: i == selectedGroup ? 18 : 16, weight: i == selectedGroup ? .bold : .regular)).foregroundStyle(i == selectedGroup ? .white : .white.opacity(0.55)).padding(.horizontal, 12).padding(.vertical, 10).overlay(alignment: .bottom) { if i == selectedGroup { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } }
+                        Text(["消息", "通知", "好友"][i]).font(.system(size: i == selectedGroup ? 18 : 16, weight: i == selectedGroup ? .bold : .regular)).foregroundStyle(i == selectedGroup ? .white : .white.opacity(0.55)).padding(.horizontal, 12).padding(.vertical, 10).overlay(alignment: .bottom) { if i == selectedGroup { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } }
                     }
                 }
             }
             Spacer(minLength: 8)
-            HStack { Image(systemName: "magnifyingglass").foregroundStyle(.secondary); TextField(selectedGroup == 1 ? "搜索好友" : "搜索消息", text: $search).foregroundStyle(.primary).tint(.primary) }.padding(.horizontal, 12).frame(width: 150, height: 34).background(Color.white.opacity(0.10)).clipShape(Capsule())
+            HStack { Image(systemName: "magnifyingglass").foregroundStyle(.secondary); TextField(selectedGroup == 2 ? "搜索好友" : selectedGroup == 1 ? "搜索通知" : "搜索消息", text: $search).foregroundStyle(.primary).tint(.primary) }.padding(.horizontal, 12).frame(width: 150, height: 34).background(Color.white.opacity(0.10)).clipShape(Capsule())
         }.padding(.horizontal, 18).padding(.top, 12).padding(.bottom, 4)
     }
     private func messageRow(_ item: MessageItem) -> some View { Button { } label: { HStack(spacing: 12) { Circle().fill(item.color).frame(width: 54, height: 54).overlay(Image(systemName: item.icon).foregroundStyle(.white).font(.system(size: 22))); VStack(alignment: .leading, spacing: 6) { HStack { Text(item.name).font(.system(size: 17, weight: .medium)).foregroundStyle(.white); Spacer(); Text(item.time).font(.caption).foregroundStyle(.white.opacity(0.48)) }; Text(item.preview).font(.system(size: 14)).foregroundStyle(.white.opacity(0.58)).lineLimit(1) }; Spacer() }.padding(.horizontal, 20).frame(height: 82).overlay(alignment: .bottom) { Color.white.opacity(0.08).frame(height: 1).padding(.leading, 86) } }.buttonStyle(.plain) }
