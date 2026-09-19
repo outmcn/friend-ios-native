@@ -51,9 +51,9 @@ struct NativeHomeView: View {
     private func starPlaceholders(width: CGFloat, top: CGFloat) -> some View {
         let gap = px(14, width), cardWidth = (width - px(64, width) - gap) / 2
         return VStack(spacing: gap) {
-            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.18,green:0.48,blue:0.94), icon: "bolt.fill"); placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.50,green:0.23,blue:0.84), icon: "headphones") }
-            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.92,green:0.26,blue:0.65), icon: "sparkles"); placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.95,green:0.34,blue:0.52), icon: "heart.fill") }
-            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.58,green:0.25,blue:0.78), icon: "wineglass.fill"); placeholderCard(width: cardWidth, height: px(150, width), tint: Color(red:0.89,green:0.90,blue:0.96), icon: "ghost.fill", darkIcon: true) }
+            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.18,green:0.48,blue:0.94), icon: "bolt.fill"); placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.50,green:0.23,blue:0.84), icon: "headphones") }
+            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.92,green:0.26,blue:0.65), icon: "sparkles"); placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.95,green:0.34,blue:0.52), icon: "heart.fill") }
+            HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.58,green:0.25,blue:0.78), icon: "wineglass.fill"); placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.89,green:0.90,blue:0.96), icon: "ghost.fill", darkIcon: true) }
         }.padding(.horizontal, px(32, width)).padding(.top, top + px(112, width)).frame(maxWidth: .infinity)
     }
 
