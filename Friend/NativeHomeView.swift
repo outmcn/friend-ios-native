@@ -4,6 +4,8 @@ struct NativeHomeView: View {
     @StateObject private var music = BackgroundMusicPlayer.shared
     @State private var selectedTab = 0
     @State private var showMatching = false
+    @State private var showSearch = false
+    @State private var showStarInfo = false
     private let designWidth: CGFloat = 750
     private func px(_ rpx: CGFloat, _ width: CGFloat) -> CGFloat { width * rpx / designWidth }
 
@@ -19,6 +21,8 @@ struct NativeHomeView: View {
         }
         .ignoresSafeArea()
         .background(NavigationLink(destination: VoiceMatchingView(), isActive: $showMatching) { EmptyView() })
+        .sheet(isPresented: $showSearch) { HomeSearchSheet() }
+        .sheet(isPresented: $showStarInfo) { StarInfoSheet() }
     }
 
     @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
@@ -62,7 +66,7 @@ struct NativeHomeView: View {
                 Spacer()
                 HStack(spacing: px(20, width)) {
                     Button { music.toggle() } label: { Image(music.isPlaying ? "FriendMusicWhite" : "FriendMusicBlack").resizable().scaledToFit().frame(width: px(54, width), height: px(54, width)) }
-                    Button { } label: { HStack(spacing: px(8, width)) { Image("FriendScreen").resizable().scaledToFit().frame(width: px(20, width), height: px(20, width)); Text("筛选").font(.system(size: px(24, width))) }.foregroundStyle(.white).frame(width: px(120, width), height: px(54, width)).background(Image("FriendScreenBackground").resizable().scaledToFill()).clipShape(Capsule()).overlay(Capsule().stroke(.white, lineWidth: px(2, width))) }
+                    Button { showSearch = true } label: { HStack(spacing: px(8, width)) { Image("FriendScreen").resizable().scaledToFit().frame(width: px(20, width), height: px(20, width)); Text("筛选").font(.system(size: px(24, width))) }.foregroundStyle(.white).frame(width: px(120, width), height: px(54, width)).background(Image("FriendScreenBackground").resizable().scaledToFill()).clipShape(Capsule()).overlay(Capsule().stroke(.white, lineWidth: px(2, width))) }
                 }
             }.padding(.horizontal, px(56, width))
         }
@@ -70,7 +74,7 @@ struct NativeHomeView: View {
 
     private func sourceFunctionButtons(width: CGFloat, height: CGFloat) -> some View {
         let icon = px(128, width), groupHeight = icon + px(28, width) + px(45, width)
-        return HStack(spacing: 0) { Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2); Button { } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
+        return HStack(spacing: 0) { Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2); Button { showStarInfo = true } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
     }
     private func sourceFunction(image: String, title: String, width: CGFloat, icon: CGFloat) -> some View { VStack(spacing: px(28, width)) { Image(image).resizable().scaledToFit().frame(width: icon, height: icon); ZStack { Image("FriendTextBackground").resizable().scaledToFill(); Text(title).font(.system(size: px(32, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.56), radius: px(10, width)) }.frame(width: px(159, width), height: px(45, width)) } }
 
