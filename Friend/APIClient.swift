@@ -53,8 +53,10 @@ final class APIClient {
         var body = Data()
         body.append(Data("--\(boundary)\r\n".utf8)); body.append(Data("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n".utf8)); body.append(Data("Content-Type: \(mimeType)\r\n\r\n".utf8)); body.append(data); body.append(Data("\r\n--\(boundary)--\r\n".utf8))
         let (responseData, response) = try await session.upload(for: request, from: body)
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else { throw APIError(statusCode: (response as? HTTPURLResponse)?.statusCode, message: "头像上传失败") }
-        return try decoder.decode(APIEnvelope<UploadResult>.self, from: responseData)
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else { throw APIError(statusCode: (response as? HTTPURLResponse)?.statusCode, message: String(data: responseData, encoding: .utf8) ?? "图片上传失败") }
+        let result: APIEnvelope<UploadResult> = try decoder.decode(APIEnvelope<UploadResult>.self, from: responseData)
+        guard result.code == 200, result.data?.url != nil else { throw APIError(statusCode: result.code, message: result.msg ?? "图片上传失败") }
+        return result
     }
 }
 
