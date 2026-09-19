@@ -7,6 +7,8 @@ struct UserCenterView: View {
     @State private var cachedCity: String?
     @State private var showProfileEditor = false
     @State private var showUserMenu = false
+    @State private var showFootsteps = false
+    @State private var showScanner = false
     @State private var selectedDynamicsCategory = 0
     let topSafeArea: CGFloat?
     private let designWidth: CGFloat = 750
@@ -49,11 +51,11 @@ struct UserCenterView: View {
                     }
                 }
             }
-        }.navigationTitle("").navigationBarHidden(true).sheet(isPresented: $showLogin) { NavigationView { LoginView() } }.sheet(isPresented: $showProfileEditor) { if let info = model.userInfo { ProfileEditorSheet(info: info) } }.sheet(isPresented: $showUserMenu) { UserMenuSheet() }.task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }.onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
+        }.navigationTitle("").navigationBarHidden(true).sheet(isPresented: $showLogin) { NavigationView { LoginView() } }.sheet(isPresented: $showProfileEditor) { if let info = model.userInfo { ProfileEditorSheet(info: info) } }.sheet(isPresented: $showUserMenu) { UserMenuSheet() }.sheet(isPresented: $showFootsteps) { UserMenuSheet() }.sheet(isPresented: $showScanner) { UserMenuSheet() }.task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }.onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
     }
     private func loadAll() async { await model.loadIfNeeded(); dynamics.loadIfNeeded(); Task { do { try await dynamics.load() } catch { dynamics.errorMessage = error.localizedDescription } } }
     private func refreshAll() async { await model.refresh(); do { try await dynamics.load() } catch { dynamics.errorMessage = error.localizedDescription } }
-    private func topBar(width w: CGFloat) -> some View { HStack { HStack(spacing: 0) { Spacer(); Button { showUserMenu = true } label: { ProfileActionIcon(kind: .menu).frame(width: px(38, w), height: px(38, w)) } }.font(.system(size: px(32, w), weight: .medium)).foregroundStyle(Color(white: 0.96)).frame(height: px(60, w)) }.frame(height: px(52, w)) }
+    private func topBar(width w: CGFloat) -> some View { HStack { Spacer(); HStack(spacing: px(22, w)) { Button { showFootsteps = true } label: { Image(systemName: "figure.walk").font(.system(size: px(30, w), weight: .medium)).foregroundStyle(.white) }.frame(width: px(42, w), height: px(42, w)); Button { showScanner = true } label: { Image(systemName: "qrcode.viewfinder").font(.system(size: px(29, w), weight: .medium)).foregroundStyle(.white) }.frame(width: px(42, w), height: px(42, w)); Button { showUserMenu = true } label: { ProfileActionIcon(kind: .menu).frame(width: px(38, w), height: px(38, w)) }.frame(width: px(42, w), height: px(42, w)) }.padding(.trailing, px(28, w)) }.frame(height: px(52, w)) }
     private func profile(_ info: PersonalCenter, width w: CGFloat) -> some View {
         HStack(spacing: px(24, w)) {
             VStack(alignment: .leading, spacing: px(18, w)) {
