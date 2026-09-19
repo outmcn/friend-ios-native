@@ -4,6 +4,7 @@ struct NativeHomeView: View {
     @StateObject private var music = BackgroundMusicPlayer.shared
     @State private var selectedTab = 0
     @State private var showMatching = false
+    @State private var showMatchingSheet = false
     @State private var showSearch = false
     @State private var showStarInfo = false
     private let designWidth: CGFloat = 750
@@ -23,6 +24,7 @@ struct NativeHomeView: View {
         .background(NavigationLink(destination: VoiceMatchingView(), isActive: $showMatching) { EmptyView() })
         .sheet(isPresented: $showSearch) { HomeSearchSheet() }
         .sheet(isPresented: $showStarInfo) { StarInfoSheet() }
+        .sheet(isPresented: $showMatchingSheet) { VideoMatchingSheet() }
     }
 
     @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
@@ -74,7 +76,7 @@ struct NativeHomeView: View {
 
     private func sourceFunctionButtons(width: CGFloat, height: CGFloat) -> some View {
         let icon = px(128, width), groupHeight = icon + px(28, width) + px(45, width)
-        return HStack(spacing: 0) { Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2); Button { showStarInfo = true } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
+        return HStack(spacing: 0) { Button { showMatchingSheet = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2); Button { showStarInfo = true } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
     }
     private func sourceFunction(image: String, title: String, width: CGFloat, icon: CGFloat) -> some View { VStack(spacing: px(28, width)) { Image(image).resizable().scaledToFit().frame(width: icon, height: icon); ZStack { Image("FriendTextBackground").resizable().scaledToFill(); Text(title).font(.system(size: px(32, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.56), radius: px(10, width)) }.frame(width: px(159, width), height: px(45, width)) } }
 
