@@ -20,7 +20,7 @@ struct OtherUserProfileView: View {
                 if let message = model.message { Text(message).foregroundStyle(.red).padding() }
                 ForEach(model.posts) { post in NavigationLink { DynamicDetailView(blog: post) } label: { VStack(alignment: .leading, spacing: 8) { Text(post.content ?? "").foregroundStyle(.white); Text(post.pushTime ?? "").font(.caption).foregroundStyle(.white.opacity(0.55)); HStack { Label("\(post.fabulous ?? 0)", systemImage: "heart"); Label("\(post.comment ?? 0)", systemImage: "message") }.font(.caption).foregroundStyle(.white.opacity(0.7)) }.padding(14).frame(maxWidth: .infinity, alignment: .leading).background(Color.white.opacity(0.1)).clipShape(RoundedRectangle(cornerRadius: 14)) }.buttonStyle(.plain) }.padding(.horizontal)
             }
-        }.background(Color(red: 0.02, green: 0.03, blue: 0.07).ignoresSafeArea()).navigationTitle("个人主页").task { await model.load() }
+        }.background(Color(red: 0.02, green: 0.03, blue: 0.07).ignoresSafeArea()).navigationTitle("Ta的主页").task { await model.load() }
     }
     private func stat(_ value: String, _ title: String) -> some View { VStack { Text(value).bold(); Text(title).font(.caption).foregroundStyle(.secondary) } }
 }
