@@ -14,7 +14,7 @@ struct OtherUserProfileView: View {
                     RemoteAvatar(urlString: model.info?.headPortrait ?? seedAvatar, size: 76)
                     VStack(alignment: .leading, spacing: 6) { Text(model.info?.nickName ?? seedName).font(.title3.bold()).foregroundStyle(.white); Text(model.info?.city ?? "").font(.caption).foregroundStyle(.white.opacity(0.6)) }
                     Spacer()
-                    if let status = model.info?.followStatus, status != "FRIEND" { Button(status == "FOLLOW" ? "已关注" : "关注") { Task { await model.toggleFollow() } }.buttonStyle(.borderedProminent) }
+                    Button(model.followTitle) { Task { await model.toggleFollow() } }.buttonStyle(.borderedProminent)
                 }.padding()
                 HStack { stat("\(model.info?.blogCount ?? Int64(model.posts.count))", "动态"); Spacer(); stat("\(model.info?.followCount ?? 0)", "关注"); Spacer(); stat("\(model.info?.fansCount ?? 0)", "粉丝") }.padding(.horizontal)
                 if let message = model.message { Text(message).foregroundStyle(.red).padding() }
@@ -32,6 +32,7 @@ struct OtherUserProfileView: View {
     @Published var message: String?
     @Published var followCount: Int64 = 0
     @Published var fansCount: Int64 = 0
+    var followTitle: String { info?.followStatus == "FOLLOW" || info?.followStatus == "FRIEND" ? "已关注" : "关注" }
     init(userId: Int, seedName: String, seedAvatar: String?) { self.userId = userId; self.seedName = seedName; self.seedAvatar = seedAvatar }
     func load() async {
         do {
