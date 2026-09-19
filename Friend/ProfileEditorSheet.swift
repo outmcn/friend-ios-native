@@ -23,7 +23,7 @@ struct ProfileEditorSheet: View {
             let r: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "community/fruser/edit/personal", method: "PUT", body: body)
             guard r.code == 200 else { throw APIError(statusCode: r.code, message: r.msg ?? "保存失败") }
             dismiss()
-        } catch { error = error.localizedDescription }
+        } catch { self.error = error.localizedDescription }
         saving = false
     }
 }
