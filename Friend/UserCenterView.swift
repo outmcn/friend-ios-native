@@ -21,11 +21,13 @@ struct UserCenterView: View {
                     Color.clear.frame(height: (topSafeArea ?? proxy.safeAreaInsets.top) + px(24, w))
                     topBar(width: w)
                     if let info = model.userInfo {
-                        profile(info, width: w)
                         ScrollView(showsIndicators: false) {
-                            dynamicList(width: w)
-                                .padding(.horizontal, px(32, w))
-                                .padding(.bottom, 120)
+                            VStack(spacing: 0) {
+                                profile(info, width: w)
+                                dynamicList(width: w)
+                            }
+                            .padding(.horizontal, px(32, w))
+                            .padding(.bottom, 120)
                         }
                         .refreshable { await refreshAll() }
                     } else if TokenStore.shared.token == nil {
@@ -69,7 +71,7 @@ struct UserCenterView: View {
     }
     private func statValue(_ value: String, _ title: String, _ w: CGFloat) -> some View { VStack(alignment: .leading, spacing: 2) { Text(value).font(.system(size: px(28, w), weight: .bold)).foregroundStyle(.white); Text(title).font(.system(size: px(22, w))).foregroundStyle(.white.opacity(0.62)) } }
     private func dynamicList(width w: CGFloat) -> some View { VStack(alignment: .leading, spacing: 12) { dynamicsCategories(width: w); if dynamics.items.isEmpty { if let error=dynamics.errorMessage { Text(error).font(.system(size: px(24, w))).foregroundStyle(.red) } else { Text("暂无动态").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.6)) } } else { ForEach(dynamics.items) { blogCard($0, w) } } }.padding(.top, px(54, w)).padding(.bottom, px(50, w)) }
-    private func dynamicsCategories(width w: CGFloat) -> some View { HStack(spacing: 0) { ForEach(["动态", "锁定", "收藏", "点赞"].indices, id: \.self) { i in Button { selectedDynamicsCategory = i } label: { Text(["动态", "锁定", "收藏", "点赞"][i]).font(.system(size: px(24, w), weight: i == selectedDynamicsCategory ? .bold : .regular)).foregroundStyle(i == selectedDynamicsCategory ? .white : .white.opacity(0.55)).frame(maxWidth: .infinity).padding(.vertical, px(18, w)).overlay(alignment: .bottom) { if i == selectedDynamicsCategory { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } } } } }.background(Color.black.opacity(0.18)).clipShape(RoundedRectangle(cornerRadius: px(12, w))) }
+    private func dynamicsCategories(width w: CGFloat) -> some View { HStack(spacing: 0) { ForEach(["动态", "锁定", "收藏", "点赞"].indices, id: \.self) { i in Button { selectedDynamicsCategory = i } label: { Text(["动态", "锁定", "收藏", "点赞"][i]).font(.system(size: px(24, w), weight: i == selectedDynamicsCategory ? .bold : .regular)).foregroundStyle(i == selectedDynamicsCategory ? .white : .white.opacity(0.55)).frame(maxWidth: .infinity).padding(.vertical, px(18, w)).overlay(alignment: .bottom) { if i == selectedDynamicsCategory { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } } } } }.padding(.horizontal, px(10, w)).background(Color.black.opacity(0.18)).clipShape(RoundedRectangle(cornerRadius: px(12, w))).overlay(RoundedRectangle(cornerRadius: px(12, w)).stroke(Color.white.opacity(0.12), lineWidth: 1)) }
     private func blogCard(_ blog: BlogPageResponse, _ w: CGFloat) -> some View { NavigationLink { DynamicDetailView(blog: blog) } label: { VStack(alignment: .leading, spacing: 10) { HStack { Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.white.opacity(0.6)); Spacer() }; if let content = blog.content, !content.isEmpty { Text(content).font(.system(size: 16)).foregroundStyle(.white) }; if let images = blog.images { ForEach(images, id: \.self) { image in DynamicImageView(urlString: image) } }; HStack { Label("\(blog.fabulous ?? 0)", systemImage: "heart"); Label("\(blog.comment ?? 0)", systemImage: "message") }.font(.footnote).foregroundStyle(.white.opacity(0.75)) }.padding(14).frame(maxWidth: .infinity, alignment: .leading).background(Color.white.opacity(0.12)).clipShape(RoundedRectangle(cornerRadius: 16)) }.buttonStyle(.plain) }
 }
 
