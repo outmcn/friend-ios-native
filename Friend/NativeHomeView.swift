@@ -39,7 +39,21 @@ struct NativeHomeView: View {
     }
 
     private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) { sourceHeader(width: width, top: top); sourceFunctionButtons(width: width, height: height); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
+        ZStack(alignment: .topLeading) { sourceHeader(width: width, top: top); starPlaceholders(width: width, top: top); sourceFunctionButtons(width: width, height: height); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
+    }
+
+    private func starPlaceholders(width: CGFloat, top: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: px(34, width)) {
+            HStack(spacing: 0) {
+                placeholderCard(width: width, tint: Color(red:0.19,green:0.47,blue:0.94), icon: "bolt.fill")
+                placeholderCard(width: width, tint: Color(red:0.55,green:0.25,blue:0.86), icon: "headphones")
+                placeholderCard(width: width, tint: Color(red:0.88,green:0.25,blue:0.65), icon: "sparkles")
+            }
+        }.padding(.horizontal, px(32, width)).padding(.top, top + px(112, width)).frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func placeholderCard(width: CGFloat, tint: Color, icon: String) -> some View {
+        VStack(spacing: px(10, width)) { RoundedRectangle(cornerRadius: px(18, width)).fill(LinearGradient(colors: [tint.opacity(0.9), tint.opacity(0.45)], startPoint: .topLeading, endPoint: .bottomTrailing)).frame(width: px(208, width), height: px(208, width)).overlay(Image(systemName: icon).font(.system(size: px(48, width), weight: .bold)).foregroundStyle(.white.opacity(0.9))); Text("占位内容").font(.system(size: px(22, width), weight: .medium)).foregroundStyle(.white.opacity(0.85)) }.frame(maxWidth: .infinity)
     }
 
     private func sourceHeader(width: CGFloat, top: CGFloat) -> some View {
