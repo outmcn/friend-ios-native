@@ -23,7 +23,7 @@ struct NativeHomeView: View {
 
     @ViewBuilder private func tabContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
         switch selectedTab {
-        case 1: sourceBlankTab(width: width, height: height, bottomInset: bottomInset)
+        case 1: DiscoveryView().overlay(alignment: .bottom) { sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
         case 2: sourceBlankTab(width: width, height: height, bottomInset: bottomInset)
         case 3: sourceUserTab(width: width, height: height, top: top, bottomInset: bottomInset)
         default: homeContent(width: width, height: height, top: top, bottomInset: bottomInset)
