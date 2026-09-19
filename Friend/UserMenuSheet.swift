@@ -2,20 +2,22 @@ import SwiftUI
 
 struct UserMenuSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var logoutPending = false
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                Image(systemName: "sparkles").font(.system(size: 58)).foregroundStyle(.yellow)
-                Text("我的").font(.title2.bold())
-                Text("更多个人功能即将开放。\n设置入口后续补充。")
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
-                Button("知道了") { dismiss() }.buttonStyle(.borderedProminent)
-                Spacer()
+            List {
+                Section("设置") {
+                    NavigationLink("隐私设置") { PrivacyView() }
+                    NavigationLink("账户充值") { RechargeView() }
+                    Button("退出登录", role: .destructive) { logoutPending = true }
+                }
             }
-            .padding()
-            .navigationTitle("我的")
+            .navigationTitle("设置")
             .navigationBarTitleDisplayMode(.inline)
+            .confirmationDialog("确定退出登录吗？", isPresented: $logoutPending) {
+                Button("退出登录", role: .destructive) { SessionStore.shared.logout(); dismiss() }
+                Button("取消", role: .cancel) { }
+            }
         }
     }
 }
