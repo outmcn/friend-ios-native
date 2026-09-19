@@ -17,7 +17,7 @@ struct VideoMatchingSheet: View {
                         Image("FriendVideoMatchingRing").resizable().scaledToFit().frame(width: w, height: px(520,w))
                         Circle().fill(Color(red:0.57,green:0.62,blue:0.89)).frame(width:px(150,w),height:px(152,w)).overlay(Circle().stroke(Color(red:0.72,green:0.75,blue:0.93),lineWidth:px(8,w))).shadow(color:.indigo.opacity(0.7),radius:px(8,w))
                         if let avatar = model.avatarURL { RemoteAvatar(urlString: avatar, size: px(118,w)) } else { Image(systemName:"person.fill").font(.system(size:px(42,w))).foregroundStyle(.white.opacity(0.8)) }
-                    }.frame(width:w,height:px(520,w)).padding(.top, px(16,w))
+                    }.frame(width:w,height:px(520,w),alignment:.center).padding(.top, px(16,w))
                     HStack(spacing:px(12,w)) { matchButton(title:"加速匹配",type:"SENIOR",icon:true,width:w); matchButton(title:"普通匹配",type:"ORDINARY",icon:false,width:w) }.frame(width:px(572,w),height:px(74,w)).padding(.top,px(12,w))
                     if model.isMatching { ProgressView().tint(.white).padding(.top, 12) }
                     if let error=model.errorMessage { Text(error).foregroundStyle(.red).font(.footnote).padding(.top,8) }
