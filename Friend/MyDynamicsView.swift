@@ -23,7 +23,7 @@ struct DynamicDetailView: View {
                     HStack { RemoteAvatar(urlString:blog.headPortrait,size:48); VStack(alignment:.leading){Text(blog.nickName ?? "用户").font(.headline);Text(blog.pushTime ?? "").font(.caption).foregroundStyle(.secondary)}; Spacer(); Menu { Button("删除动态",role:.destructive){Task{do{try await model.delete(blog); UserDefaults.standard.removeObject(forKey:"friend.user.dynamics.cache"); dismiss()}catch{actionError=error.localizedDescription}}} } label:{Image(systemName:"ellipsis")} }
                     if let c=blog.content,!c.isEmpty { Text(c) }
                     if let imgs=blog.images,!imgs.isEmpty { ForEach(imgs,id:\.self){ image in DynamicImageView(urlString:image) } }
-                    HStack { Button { Task { do { try await model.toggleLike(blog) } catch { actionError = error.localizedDescription } } } label:{Label("\(model.likeCount)",systemImage:model.liked ? "heart.fill":"heart")}; Spacer() }.foregroundStyle(model.liked ? .red:.secondary)
+                    HStack { Button { Task { do { try await model.toggleLike(blog) } catch { actionError = error.localizedDescription } } } label:{Label("\(model.likeCount)",systemImage:model.liked ? "heart.fill":"heart")}; Label("\(blog.favorite ?? 0)", systemImage: "tag"); Spacer() }.foregroundStyle(model.liked ? .red:.secondary)
                     Divider(); Text("评论").font(.headline)
                     ForEach(model.comments){ comment in CommentRow(comment:comment,currentUserId:model.currentUserId,blogOwnerId:blog.userId,onTap:{model.replyTarget=comment;inputFocused=true},onDelete:{id in Task{do{try await model.deleteComment(id:id,blogId:blog.id)}catch{actionError=error.localizedDescription}}}) }
                 }.padding()
