@@ -33,8 +33,8 @@ struct DiscoveryView: View {
                     Color.clear.frame(height: max(proxy.safeAreaInsets.top, 44))
                     header
                     ScrollView(showsIndicators: false) {
-                        LazyVStack(spacing: 14) { ForEach(model.posts) { post in postCard(post) } }.padding(.horizontal, 14).padding(.top, 14).padding(.bottom, 140)
-                    }
+                        LazyVStack(spacing: 14) { ForEach(model.posts) { post in postCard(post) } }.padding(.horizontal, 14).padding(.top, 14)
+                    }.frame(height: max(0, proxy.size.height - max(proxy.safeAreaInsets.top, 44) - 82 - 150))
                 }
             }
         }
