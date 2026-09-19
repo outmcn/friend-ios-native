@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct FollowFansView: View {
-    @Environment(\.dismiss) private var dismiss
+    let initialTab: Int
     @StateObject private var model = FollowFansViewModel()
     @State private var tab = 0
 
@@ -24,7 +24,7 @@ struct FollowFansView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: tab) { _ in Task { await model.load(tab: tab) } }
-        .task { await model.load(tab: tab) }
+        .task { tab = initialTab; await model.load(tab: initialTab) }
     }
 
     private func tabButton(_ title: String, _ value: Int) -> some View {

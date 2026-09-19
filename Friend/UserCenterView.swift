@@ -6,7 +6,8 @@ struct UserCenterView: View {
     @State private var showLogin = false
     @State private var cachedCity: String?
     @State private var showProfileEditor = false
-    @State private var showAvatarActions = false
+    @State private var showFollowFans = false
+    @State private var followFansTab = 0
     @State private var selectedDynamicsCategory = 0
     let topSafeArea: CGFloat?
     private let designWidth: CGFloat = 750
@@ -57,7 +58,7 @@ struct UserCenterView: View {
                     }
                 }
             }
-        }.navigationTitle("").navigationBarHidden(true).sheet(isPresented: $showLogin) { NavigationView { LoginView() } }.sheet(isPresented: $showProfileEditor) { if let info = model.userInfo { ProfileEditorSheet(info: info, onSaved: applyProfileUpdate) } }.sheet(isPresented: $showAvatarActions) { if let info = model.userInfo { AvatarActionSheet(info: info) } }.task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }.onReceive(NotificationCenter.default.publisher(for: .profileUpdated)) { note in if let updated = note.object as? ProfileUpdate, var current = model.userInfo { current = PersonalCenter(id: current.id, headPortrait: updated.headPortrait, nickName: updated.nickName, gender: current.gender, goldBalance: current.goldBalance, city: current.city, blogCount: current.blogCount, followCount: current.followCount, fansCount: current.fansCount, likeCount: current.likeCount, blog: current.blog); model.userInfo = current; if let data = try? JSONEncoder().encode(current) { UserDefaults.standard.set(data, forKey: "friend.user.center.cache") } } }.onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
+        }.navigationTitle("").navigationBarHidden(true).sheet(isPresented: $showLogin) { NavigationView { LoginView() } }.sheet(isPresented: $showFollowFans) { FollowFansView(initialTab: followFansTab) }.sheet(isPresented: $showAvatarActions) { if let info = model.userInfo { AvatarActionSheet(info: info) } }.task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }.onReceive(NotificationCenter.default.publisher(for: .profileUpdated)) { note in if let updated = note.object as? ProfileUpdate, var current = model.userInfo { current = PersonalCenter(id: current.id, headPortrait: updated.headPortrait, nickName: updated.nickName, gender: current.gender, goldBalance: current.goldBalance, city: current.city, blogCount: current.blogCount, followCount: current.followCount, fansCount: current.fansCount, likeCount: current.likeCount, blog: current.blog); model.userInfo = current; if let data = try? JSONEncoder().encode(current) { UserDefaults.standard.set(data, forKey: "friend.user.center.cache") } } }.onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
     }
     private func applyProfileUpdate(_ updated: ProfileUpdate) { guard let current = model.userInfo else { return }; let next = PersonalCenter(id: current.id, headPortrait: updated.headPortrait, nickName: updated.nickName, gender: current.gender, goldBalance: current.goldBalance, city: current.city, blogCount: current.blogCount, followCount: current.followCount, fansCount: current.fansCount, likeCount: current.likeCount, blog: current.blog); model.userInfo = next; if let data = try? JSONEncoder().encode(next) { UserDefaults.standard.set(data, forKey: "friend.user.center.cache") } }
     private func loadAll() async { await model.loadIfNeeded(); dynamics.loadIfNeeded(); Task { do { try await dynamics.load() } catch { dynamics.errorMessage = error.localizedDescription } } }
@@ -73,8 +74,8 @@ struct UserCenterView: View {
                     Text("IP \((info.city ?? cachedCity ?? "未知").replacingOccurrences(of: "市", with: ""))").font(.system(size: px(24, w))).foregroundStyle(.white.opacity(0.65))
                 }
                 HStack(spacing: px(32, w)) {
-                    statValue("\(info.followCount ?? 0)", "关注", w)
-                    statValue("\(info.fansCount ?? 0)", "粉丝", w)
+                    Button { followFansTab = 0; showFollowFans = true } label: { statValue("\(info.followCount ?? 0)", "关注", w) }.buttonStyle(.plain)
+                    Button { followFansTab = 1; showFollowFans = true } label: { statValue("\(info.fansCount ?? 0)", "粉丝", w) }.buttonStyle(.plain)
                     statValue("\(info.likeCount ?? 0)", "获赞", w)
                 }
             }
