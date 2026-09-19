@@ -18,5 +18,5 @@ struct RemoteAvatar: View {
         }.frame(width: size, height: size).background(Color.gray.opacity(0.35)).clipShape(Circle())
     }
     private var fallback: some View { Image(systemName: "person.fill").resizable().scaledToFit().padding(size * 0.24).foregroundStyle(.white.opacity(0.8)) }
-    private func normalizedURL(_ value: String) -> URL? { let raw=value.trimmingCharacters(in:.whitespacesAndNewlines); guard !raw.isEmpty,raw.count<2048 else{return nil}; if let u=URL(string:raw),let s=u.scheme?.lowercased(),s=="http"||s=="https"{return u}; return URL(string:"https://friend.outmcn.net/"+raw.trimmingCharacters(in:CharacterSet(charactersIn:"/"))) }
+    private func normalizedURL(_ value: String) -> URL? { let raw=value.trimmingCharacters(in:.whitespacesAndNewlines); guard !raw.isEmpty,raw.count<2048 else{return nil}; if let u=URL(string:raw),let scheme=u.scheme?.lowercased(),scheme=="http"||scheme=="https"{if u.host=="127.0.0.1"||u.host=="localhost"{return URL(string: "https://friend.outmcn.net"+u.path)};return u}; return URL(string:"https://friend.outmcn.net/"+raw.trimmingCharacters(in:CharacterSet(charactersIn:"/"))) }
 }
