@@ -25,6 +25,7 @@ struct DiscoveryPost: Identifiable {
 
 struct DiscoveryView: View {
     @StateObject private var model = DiscoveryViewModel()
+    @State private var showCompose = false
     var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -39,11 +40,12 @@ struct DiscoveryView: View {
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showCompose) { ComposePostView() }
         .task { await model.load() }
     }
     private var header: some View {
         VStack(spacing: 0) {
-            HStack { ForEach(["推荐", "附近", "关注"].indices, id: \.self) { i in Button { model.selectedTab = i } label: { Text(["推荐", "附近", "关注"][i]).font(.system(size: i == model.selectedTab ? 18 : 16, weight: i == model.selectedTab ? .bold : .regular)).foregroundStyle(i == model.selectedTab ? .white : .white.opacity(0.55)).padding(.horizontal, 12).padding(.vertical, 10).overlay(alignment: .bottom) { if i == model.selectedTab { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } } } }; Spacer(); Button("发一条") {}.font(.system(size: 15, weight: .medium)).foregroundStyle(Color(red: 0.95, green: 0.80, blue: 0.38)) }.padding(.horizontal, 18).padding(.top, 12).padding(.bottom, 4)
+            HStack { ForEach(["推荐", "附近", "关注"].indices, id: \.self) { i in Button { model.selectedTab = i } label: { Text(["推荐", "附近", "关注"][i]).font(.system(size: i == model.selectedTab ? 18 : 16, weight: i == model.selectedTab ? .bold : .regular)).foregroundStyle(i == model.selectedTab ? .white : .white.opacity(0.55)).padding(.horizontal, 12).padding(.vertical, 10).overlay(alignment: .bottom) { if i == model.selectedTab { Color(red: 0.95, green: 0.80, blue: 0.38).frame(height: 2) } } } }; Spacer(); Button("发一条") { showCompose = true }.font(.system(size: 15, weight: .medium)).foregroundStyle(Color(red: 0.95, green: 0.80, blue: 0.38)) }.padding(.horizontal, 18).padding(.top, 12).padding(.bottom, 4)
         }
     }
     private func postCard(_ post: DiscoveryPost) -> some View {
