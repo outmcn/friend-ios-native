@@ -42,7 +42,23 @@ struct NativeHomeView: View {
     }
 
     private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) { sourceHeader(width: width, top: top); sourceFunctionButtons(width: width, height: height); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
+        ZStack(alignment: .topLeading) { sourceHeader(width: width, top: top); starUserRecommendations(width: width, top: top); sourceFunctionButtons(width: width, height: height); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
+    }
+
+    private func starUserRecommendations(width: CGFloat, top: CGFloat) -> some View {
+        let names = model.users.prefix(3).map { $0.nickName ?? "用户" }
+        return VStack(spacing: px(18, width)) {
+            Text("视频聊，更靠谱").font(.system(size: px(36, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.45), radius: px(8, width))
+            HStack(alignment: .top, spacing: px(22, width)) {
+                recommendation(user: model.users.indices.contains(0) ? model.users[0] : nil, caption: "送给你的小姐姐", width: width, size: px(92, width))
+                recommendation(user: model.users.indices.contains(1) ? model.users[1] : nil, caption: "\(names.count > 1 ? names[1] : "For you")", width: width, size: px(122, width))
+                recommendation(user: model.users.indices.contains(2) ? model.users[2] : nil, caption: "For you", width: width, size: px(92, width))
+            }
+        }.frame(maxWidth: .infinity).padding(.top, top + px(92, width))
+    }
+
+    private func recommendation(user: DiscoveryUser?, caption: String, width: CGFloat, size: CGFloat) -> some View {
+        VStack(spacing: px(8, width)) { if let user { RemoteAvatar(urlString: user.headPortrait, size: size) } else { Circle().fill(Color.white.opacity(0.18)).frame(width: size, height: size).overlay(Image(systemName: "person.fill").foregroundStyle(.white.opacity(0.7))) }; Text(user?.nickName ?? caption).font(.system(size: px(20, width), weight: .medium)).foregroundStyle(.white).lineLimit(1) }.frame(maxWidth: .infinity)
     }
 
     private func sourceHeader(width: CGFloat, top: CGFloat) -> some View {
@@ -60,7 +76,7 @@ struct NativeHomeView: View {
 
     private func sourceFunctionButtons(width: CGFloat, height: CGFloat) -> some View {
         let icon = px(128, width), groupHeight = icon + px(28, width) + px(45, width)
-        return HStack(spacing: 0) { Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "语音匹配", width: width, icon: icon) }.frame(width: width / 2); Button { } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
+        return HStack(spacing: 0) { Button { showMatching = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2); Button { } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(266, width) - groupHeight / 2)
     }
     private func sourceFunction(image: String, title: String, width: CGFloat, icon: CGFloat) -> some View { VStack(spacing: px(28, width)) { Image(image).resizable().scaledToFit().frame(width: icon, height: icon); ZStack { Image("FriendTextBackground").resizable().scaledToFill(); Text(title).font(.system(size: px(32, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.56), radius: px(10, width)) }.frame(width: px(159, width), height: px(45, width)) } }
 
