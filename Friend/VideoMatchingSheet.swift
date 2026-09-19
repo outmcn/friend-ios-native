@@ -12,19 +12,19 @@ struct VideoMatchingSheet: View {
                 Image("FriendVideoMatchingBg").resizable().scaledToFill().ignoresSafeArea()
                 Color.black.opacity(0.12).ignoresSafeArea()
                 GeometryReader { content in
-                    let circleHeight = min(px(520,w), content.size.height * 0.58)
+                    let circleHeight = min(px(590,w), content.size.height * 0.62)
                     let buttonHeight = px(74,w)
-                    let groupHeight = circleHeight + px(12,w) + buttonHeight
+                    let groupHeight = circleHeight + px(32,w) + buttonHeight
                     VStack(spacing: 0) {
                         ZStack {
                             Image("FriendVideoMatchingRing").resizable().scaledToFit().frame(width: w, height: circleHeight)
                             Circle().fill(Color(red:0.57,green:0.62,blue:0.89)).frame(width:px(150,w),height:px(152,w)).overlay(Circle().stroke(Color(red:0.72,green:0.75,blue:0.93),lineWidth:px(8,w))).shadow(color:.indigo.opacity(0.7),radius:px(8,w))
                             if let avatar = model.avatarURL { RemoteAvatar(urlString: avatar, size: px(118,w)) } else { Image(systemName:"person.fill").font(.system(size:px(42,w))).foregroundStyle(.white.opacity(0.8)) }
                         }.frame(width:w,height:circleHeight)
-                        HStack(spacing:px(12,w)) { matchButton(title:"加速匹配",type:"SENIOR",icon:true,width:w); matchButton(title:"普通匹配",type:"ORDINARY",icon:false,width:w) }.frame(width:px(572,w),height:buttonHeight).padding(.top,px(12,w))
+                        HStack(spacing:px(12,w)) { matchButton(title:"加速匹配",type:"SENIOR",icon:true,width:w); matchButton(title:"普通匹配",type:"ORDINARY",icon:false,width:w) }.frame(width:px(572,w),height:buttonHeight).padding(.top,px(32,w))
                         if model.isMatching { ProgressView().tint(.white).padding(.top, 12) }
                         if let error=model.errorMessage { Text(error).foregroundStyle(.red).font(.footnote).padding(.top,8) }
-                    }.frame(maxWidth:.infinity).frame(height:groupHeight).position(x:content.size.width/2,y:content.size.height/2)
+                    }.frame(maxWidth:.infinity).frame(height:groupHeight).position(x:content.size.width/2,y:content.size.height/2 - px(18,w))
                 }
             }
         }.task { await model.load() }
