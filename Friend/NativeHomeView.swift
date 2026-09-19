@@ -45,16 +45,16 @@ struct NativeHomeView: View {
     }
 
     private func homeContent(width: CGFloat, height: CGFloat, top: CGFloat, bottomInset: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) { sourceHeader(width: width, top: top); sourceFunctionButtons(width: width, height: height); starPlaceholders(width: width, top: top); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
+        ZStack(alignment: .topLeading) { sourceHeader(width: width, top: top); sourceFunctionButtons(width: width, height: height, top: top); starPlaceholders(width: width, height: height, top: top); sourceTabBar(width: width, height: height, bottomInset: bottomInset) }
     }
 
-    private func starPlaceholders(width: CGFloat, top: CGFloat) -> some View {
+    private func starPlaceholders(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
         let gap = px(14, width), cardWidth = (width - px(64, width) - gap) / 2
         return VStack(spacing: gap) {
             HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.18,green:0.48,blue:0.94), icon: "bolt.fill"); placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.50,green:0.23,blue:0.84), icon: "headphones") }
             HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.92,green:0.26,blue:0.65), icon: "sparkles"); placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.95,green:0.34,blue:0.52), icon: "heart.fill") }
             HStack(spacing: gap) { placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.58,green:0.25,blue:0.78), icon: "wineglass.fill"); placeholderCard(width: cardWidth, height: px(120, width), tint: Color(red:0.89,green:0.90,blue:0.96), icon: "ghost.fill", darkIcon: true) }
-        }.padding(.horizontal, px(32, width)).padding(.top, top + px(112, width)).padding(.bottom, px(150, width)).frame(maxWidth: .infinity).position(x: width / 2, y: width * 0.67)
+        }.padding(.horizontal, px(32, width)).padding(.top, top + px(112, width)).padding(.bottom, px(150, width)).frame(maxWidth: .infinity).position(x: width / 2, y: height * 0.70)
     }
 
     private func placeholderCard(width: CGFloat, height: CGFloat, tint: Color, icon: String, darkIcon: Bool = false) -> some View {
@@ -74,9 +74,9 @@ struct NativeHomeView: View {
         }
     }
 
-    private func sourceFunctionButtons(width: CGFloat, height: CGFloat) -> some View {
+    private func sourceFunctionButtons(width: CGFloat, height: CGFloat, top: CGFloat) -> some View {
         let icon = px(128, width), groupHeight = icon + px(28, width) + px(45, width)
-        return HStack(spacing: 0) { Button { showStarInfo = true } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2); Button { showMatchingSheet = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: height - px(300, width) - groupHeight / 2)
+        return HStack(spacing: 0) { Button { showStarInfo = true } label: { sourceFunction(image: "FriendStarButton", title: "点缀星空", width: width, icon: icon) }.frame(width: width / 2); Button { showMatchingSheet = true } label: { sourceFunction(image: "FriendVideoButton", title: "视频匹配", width: width, icon: icon) }.frame(width: width / 2) }.frame(width: width, height: groupHeight).position(x: width / 2, y: top + px(210, width) + groupHeight / 2)
     }
     private func sourceFunction(image: String, title: String, width: CGFloat, icon: CGFloat) -> some View { VStack(spacing: px(28, width)) { Image(image).resizable().scaledToFit().frame(width: icon, height: icon); ZStack { Image("FriendTextBackground").resizable().scaledToFill(); Text(title).font(.system(size: px(32, width), weight: .bold)).foregroundStyle(.white).shadow(color: .white.opacity(0.56), radius: px(10, width)) }.frame(width: px(159, width), height: px(45, width)) } }
 
