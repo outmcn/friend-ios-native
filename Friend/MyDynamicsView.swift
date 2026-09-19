@@ -1,15 +1,24 @@
 import SwiftUI
 import UIKit
 
+struct DynamicImagePlaceholder: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(LinearGradient(colors: [Color(red: 0.16, green: 0.26, blue: 0.50), Color(red: 0.90, green: 0.47, blue: 0.28)], startPoint: .topLeading, endPoint: .bottomTrailing))
+            .frame(height: 150)
+            .overlay(Image(systemName: "photo").font(.system(size: 34)).foregroundStyle(.white.opacity(0.55)))
+    }
+}
+
 struct DynamicImageView: View {
     let urlString: String
     var body: some View {
         AsyncImage(url: imageURL) { phase in
             switch phase {
             case .success(let image): image.resizable().scaledToFit()
-            case .failure: Color.gray.opacity(0.35).overlay(Image(systemName: "photo").font(.largeTitle).foregroundStyle(.white.opacity(0.75)))
-            case .empty: ZStack { Color.gray.opacity(0.2); ProgressView().tint(.white) }
-            @unknown default: Color.gray.opacity(0.35)
+            case .failure: DynamicImagePlaceholder()
+            case .empty: DynamicImagePlaceholder()
+            @unknown default: DynamicImagePlaceholder()
             }
         }
         .frame(maxWidth: .infinity)
