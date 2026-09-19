@@ -2,12 +2,13 @@ import SwiftUI
 
 struct ProfileEditorSheet: View {
     let info: PersonalCenter
+    var onSaved: ((ProfileUpdate) -> Void)?
     @Environment(\.dismiss) private var dismiss
     @State private var nickname: String
     @State private var selectedAvatar: String
     @State private var error: String?
     @State private var saving = false
-    init(info: PersonalCenter) { self.info = info; _nickname = State(initialValue: info.nickName ?? ""); _selectedAvatar = State(initialValue: info.headPortrait ?? "zodiac_dog") }
+    init(info: PersonalCenter, onSaved: ((ProfileUpdate) -> Void)? = nil) { self.info = info; self.onSaved = onSaved; _nickname = State(initialValue: info.nickName ?? ""); _selectedAvatar = State(initialValue: info.headPortrait ?? "zodiac_dog") }
     var body: some View {
         NavigationView {
             ScrollView {
@@ -29,8 +30,9 @@ struct ProfileEditorSheet: View {
             let body = EditPersonalRequest(id: info.id ?? 0, headPortrait: selectedAvatar, nickName: nickname.trimmingCharacters(in: .whitespacesAndNewlines))
             let r: APIEnvelope<EmptyResponse> = try await APIClient.shared.request(path: "community/fruser/edit/personal", method: "PUT", body: body)
             guard r.code == 200 else { throw APIError(statusCode: r.code, message: r.msg ?? "保存失败") }
-            let updated = ProfileUpdate(id: info.id ?? 0, nickName: body.nickName, headPortrait: body.headPortrait)
+            let updated = ProfileUpdate(id: body.id, nickName: body.nickName, headPortrait: body.headPortrait)
             UserDefaults.standard.removeObject(forKey: "friend.user.center.cache")
+            onSaved?(updated)
             NotificationCenter.default.post(name: .profileUpdated, object: updated)
             dismiss()
         } catch { self.error = error.localizedDescription }
