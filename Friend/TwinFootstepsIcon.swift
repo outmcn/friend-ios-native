@@ -3,17 +3,13 @@ import SwiftUI
 struct TwinFootstepsIcon: View {
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.black.opacity(0.68))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(red: 0.48, green: 0.56, blue: 0.95), lineWidth: 1.5))
-                .shadow(color: Color(red: 0.32, green: 0.40, blue: 0.95).opacity(0.55), radius: 5)
             FootprintShape(scale: 0.82)
-                .stroke(Color.white, style: StrokeStyle(lineWidth: 2.1, lineCap: .round, lineJoin: .round))
+                .fill(Color.white)
                 .frame(width: 18, height: 25)
                 .rotationEffect(.degrees(-18))
                 .offset(x: -6, y: -4)
             FootprintShape(scale: 0.68)
-                .stroke(Color.white.opacity(0.9), style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                .fill(Color.white.opacity(0.9))
                 .frame(width: 16, height: 22)
                 .rotationEffect(.degrees(-18))
                 .offset(x: 7, y: 5)
