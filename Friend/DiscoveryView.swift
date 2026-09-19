@@ -29,6 +29,7 @@ struct DiscoveryView: View {
                         }
                         .padding(.horizontal, 14).padding(.top, 14).padding(.bottom, 140)
                     }
+                    .refreshable { await model.load() }
                 }
             }
         }
