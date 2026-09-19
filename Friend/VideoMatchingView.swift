@@ -28,13 +28,13 @@ struct VideoMatchingView: View {
 
 @MainActor final class VideoMatchingViewModel: ObservableObject {
     enum State { case idle, matching, matched, ended }
-    @Published var state: State = .idle
+    @Published var isMatching = false
     @Published var avatarURL: String?
     @Published var match: MatchInfo?
     @Published var errorMessage: String?
     private let service = MatchingService()
     func load() async { avatarURL = UserDefaults.standard.string(forKey:"friend.user.avatar") }
-    func start(type:String) async { let id = (try? JSONDecoder().decode(PersonalCenter.self,from:UserDefaults.standard.data(forKey:"friend.user.center.cache") ?? Data()).id) ?? 0; state = .matching; errorMessage=nil; do { try await service.start(type:type,userId:id); match=try await service.receive(); state = .matched } catch { errorMessage=error.localizedDescription; state = .idle } }
+    func start(type:String) async { let id = (try? JSONDecoder().decode(PersonalCenter.self,from:UserDefaults.standard.data(forKey:"friend.user.center.cache") ?? Data()).id) ?? 0; isMatching = true; errorMessage=nil; do { try await service.start(type:type,userId:id); match=try await service.receive(); isMatching = false } catch { errorMessage=error.localizedDescription; isMatching = false } }
     func beginCall() { }
-    func stop() async { service.stop(); if state == .matching { state = .idle } }
+    func stop() async { service.stop(); isMatching = false }
 }
