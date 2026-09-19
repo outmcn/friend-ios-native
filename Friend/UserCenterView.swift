@@ -13,7 +13,29 @@ struct UserCenterView: View {
     var body: some View {
         GeometryReader { proxy in
             let w = proxy.size.width
-            ZStack { Image("FriendUserIndex").resizable().scaledToFill().ignoresSafeArea(); Color.black.opacity(0.1).ignoresSafeArea(); ScrollView(showsIndicators: false) { VStack(spacing: 0) { Color.clear.frame(height: (topSafeArea ?? proxy.safeAreaInsets.top) + px(24, w)); topBar(width: w); if let info = model.userInfo { profile(info, width: w); dynamicList(width: w) } else if TokenStore.shared.token == nil { Button("请登录") { showLogin = true }.foregroundStyle(.white).padding(.top, 100) } else { DiscoveryLoadingPlaceholder().padding(.top, 36) }; Color.clear.frame(height: 120) }.padding(.horizontal, px(32, w)) }.refreshable { await refreshAll() } }
+            ZStack {
+                Image("FriendUserIndex").resizable().scaledToFill().ignoresSafeArea()
+                Color.black.opacity(0.1).ignoresSafeArea()
+                VStack(spacing: 0) {
+                    Color.clear.frame(height: (topSafeArea ?? proxy.safeAreaInsets.top) + px(24, w))
+                    topBar(width: w)
+                    if let info = model.userInfo {
+                        profile(info, width: w)
+                        ScrollView(showsIndicators: false) {
+                            dynamicList(width: w)
+                                .padding(.horizontal, px(32, w))
+                                .padding(.bottom, 120)
+                        }
+                        .refreshable { await refreshAll() }
+                    } else if TokenStore.shared.token == nil {
+                        Button("请登录") { showLogin = true }.foregroundStyle(.white).padding(.top, 100)
+                        Spacer()
+                    } else {
+                        DiscoveryLoadingPlaceholder().padding(.top, 36)
+                        Spacer()
+                    }
+                }
+            }
         }.navigationTitle("").navigationBarHidden(true).sheet(isPresented: $showLogin) { NavigationView { LoginView() } }.sheet(isPresented: $showProfileEditor) { if let info = model.userInfo { ProfileEditorSheet(info: info) } }.sheet(isPresented: $showUserMenu) { UserMenuSheet() }.task { cachedCity = LocationRefreshService.shared.cachedCity; await loadAll() }.onReceive(NotificationCenter.default.publisher(for: .locationCityUpdated)) { note in cachedCity = note.object as? String }
     }
     private func loadAll() async { await model.loadIfNeeded(); dynamics.loadIfNeeded(); Task { do { try await dynamics.load() } catch { dynamics.errorMessage = error.localizedDescription } } }
