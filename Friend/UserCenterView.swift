@@ -6,6 +6,7 @@ struct UserCenterView: View {
     @State private var showLogin = false
     @State private var cachedCity: String?
     @State private var showProfileEditor = false
+    @State private var showAvatarActions = false
     @State private var showFollowFans = false
     @State private var followFansTab = 0
     @State private var selectedDynamicsCategory = 0
